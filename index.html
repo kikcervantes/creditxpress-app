@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CreditXpress App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1a5276">
     <style>
         :root {
             --primary: #1a5276;
@@ -132,7 +130,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 1rem;
-            padding-bottom: 70px; /* Espacio para la navegación inferior */
+            padding-bottom: 70px;
         }
         
         /* Tarjetas */
@@ -210,6 +208,11 @@
         .btn-outline:hover {
             background-color: white;
             color: var(--primary);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
         }
         
         /* Estado de Crédito */
@@ -321,7 +324,7 @@
             color: var(--accent);
         }
         
-        /* Página de Solicitud de Crédito */
+        /* Formularios */
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -355,6 +358,39 @@
             color: var(--primary);
         }
         
+        /* Subida de archivos */
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--secondary);
+            background-color: #f0f8ff;
+        }
+        
+        .file-upload i {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .file-upload input {
+            display: none;
+        }
+        
+        .file-name {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        /* Calculadora */
         .calculator-results {
             background-color: var(--light);
             padding: 1.5rem;
@@ -383,6 +419,33 @@
         .result-value {
             font-weight: bold;
             color: var(--primary);
+        }
+        
+        /* Tabla de Amortización */
+        .amortization-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+        }
+        
+        .amortization-table th,
+        .amortization-table td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .amortization-table th {
+            background-color: var(--light);
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .amortization-table-container {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
         }
         
         /* Página de Perfil */
@@ -497,6 +560,33 @@
             animation: fadeIn 0.3s ease forwards;
         }
         
+        /* Login/Register */
+        .auth-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .auth-tab.active {
+            border-bottom-color: var(--accent);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
         /* Responsive */
         @media (max-width: 380px) {
             .quick-actions {
@@ -529,14 +619,62 @@
 
         <!-- Contenido Principal -->
         <main class="app-content">
+            <!-- Página de Login/Register -->
+            <section id="authPage" class="page active">
+                <div class="auth-container">
+                    <div class="auth-tabs">
+                        <div class="auth-tab active" data-tab="login">Iniciar Sesión</div>
+                        <div class="auth-tab" data-tab="register">Registrarse</div>
+                    </div>
+                    
+                    <!-- Login Form -->
+                    <div id="loginForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="loginEmail" class="form-label">Correo Electrónico</label>
+                            <input type="email" id="loginEmail" class="form-control" placeholder="tu@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword" class="form-label">Contraseña</label>
+                            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••">
+                        </div>
+                        <button class="btn btn-primary" id="loginBtn">Ingresar</button>
+                    </div>
+                    
+                    <!-- Register Form -->
+                    <div id="registerForm" class="auth-form" style="display: none;">
+                        <div class="form-group">
+                            <label for="registerName" class="form-label">Nombre Completo</label>
+                            <input type="text" id="registerName" class="form-control" placeholder="Juan Pérez García">
+                        </div>
+                        <div class="form-group">
+                            <label for="registerEmail" class="form-label">Correo Electrónico</label>
+                            <input type="email" id="registerEmail" class="form-control" placeholder="tu@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPhone" class="form-label">Teléfono</label>
+                            <input type="tel" id="registerPhone" class="form-control" placeholder="55 1234 5678">
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPassword" class="form-label">Contraseña</label>
+                            <input type="password" id="registerPassword" class="form-control" placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label for="registerConfirmPassword" class="form-label">Confirmar Contraseña</label>
+                            <input type="password" id="registerConfirmPassword" class="form-control" placeholder="••••••••">
+                        </div>
+                        <button class="btn btn-primary" id="registerBtn">Crear Cuenta</button>
+                    </div>
+                </div>
+            </section>
+
             <!-- Página de Inicio -->
-            <section id="homePage" class="page active">
+            <section id="homePage" class="page">
                 <div class="welcome-section">
                     <div class="welcome-text">
-                        <h2>¡Hola, Luis!</h2>
+                        <h2>¡Hola, <span id="userName">Usuario</span>!</h2>
                         <p>Tu crédito preaprobado está listo</p>
                     </div>
-                    <a href="#" class="btn btn-primary" id="quickLoanBtn">Solicitar $15,000</a>
+                    <a href="#" class="btn btn-primary" id="quickLoanBtn">Solicitar $5,000</a>
                 </div>
 
                 <div class="card">
@@ -545,7 +683,7 @@
                     </div>
                     <div class="credit-status">
                         <div>
-                            <div class="credit-amount">$15,000</div>
+                            <div class="credit-amount">$5,000</div>
                             <div class="credit-info">Límite preaprobado</div>
                         </div>
                         <div>
@@ -604,7 +742,7 @@
                                     <p>15 Oct 2023</p>
                                 </div>
                             </div>
-                            <div class="transaction-amount positive">+$10,000</div>
+                            <div class="transaction-amount positive">+$5,000</div>
                         </li>
                         <li class="transaction-item">
                             <div class="transaction-info">
@@ -644,23 +782,23 @@
                     <div class="form-group">
                         <label for="loanAmount" class="form-label">Monto del préstamo (MXN)</label>
                         <div class="range-container">
-                            <input type="range" id="loanAmount" min="1000" max="50000" step="1000" value="15000" class="form-control">
-                            <span class="range-value" id="loanAmountValue">$15,000</span>
+                            <input type="range" id="loanAmount" min="1000" max="5000" step="500" value="3000" class="form-control">
+                            <span class="range-value" id="loanAmountValue">$3,000</span>
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="loanTerm" class="form-label">Plazo (meses)</label>
                         <div class="range-container">
-                            <input type="range" id="loanTerm" min="3" max="24" step="1" value="12" class="form-control">
-                            <span class="range-value" id="loanTermValue">12 meses</span>
+                            <input type="range" id="loanTerm" min="3" max="12" step="1" value="6" class="form-control">
+                            <span class="range-value" id="loanTermValue">6 meses</span>
                         </div>
                     </div>
                     
                     <div class="calculator-results">
                         <div class="result-item">
                             <span class="result-label">Cuota mensual:</span>
-                            <span class="result-value" id="monthlyPayment">$1,650</span>
+                            <span class="result-value" id="monthlyPayment">$600</span>
                         </div>
                         <div class="result-item">
                             <span class="result-label">Tasa de interés anual:</span>
@@ -668,27 +806,66 @@
                         </div>
                         <div class="result-item">
                             <span class="result-label">CAT promedio:</span>
-                            <span class="result-value" id="catRate">120.5%</span>
+                            <span class="result-value" id="catRate">89.5%</span>
                         </div>
                         <div class="result-item">
                             <span class="result-label">Total a pagar:</span>
-                            <span class="result-value" id="totalPayment">$19,800</span>
+                            <span class="result-value" id="totalPayment">$3,600</span>
                         </div>
                     </div>
                     
-                    <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" id="submitLoanBtn">Solicitar este Crédito</button>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" id="showDocumentsBtn">Continuar con Documentos</button>
                 </div>
-                
+            </section>
+
+            <!-- Página de Documentos -->
+            <section id="documentsPage" class="page">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Requisitos</h3>
+                        <h3 class="card-title">Documentación Requerida</h3>
                     </div>
-                    <ul style="padding-left: 1.5rem;">
-                        <li style="margin-bottom: 0.5rem;">Ser mayor de 18 años</li>
-                        <li style="margin-bottom: 0.5rem;">Identificación oficial vigente</li>
-                        <li style="margin-bottom: 0.5rem;">Comprobante de domicilio</li>
-                        <li style="margin-bottom: 0.5rem;">Comprobante de ingresos</li>
-                    </ul>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Identificación Oficial (INE/IFE)</label>
+                        <div class="file-upload" id="idUpload">
+                            <i class="fas fa-id-card"></i>
+                            <p>Haz clic para subir tu identificación</p>
+                            <input type="file" id="idFile" accept=".pdf,.jpg,.jpeg,.png">
+                            <div class="file-name" id="idFileName">No se ha seleccionado archivo</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Comprobante de Domicilio</label>
+                        <div class="file-upload" id="addressUpload">
+                            <i class="fas fa-home"></i>
+                            <p>Haz clic para subir comprobante de domicilio</p>
+                            <input type="file" id="addressFile" accept=".pdf,.jpg,.jpeg,.png">
+                            <div class="file-name" id="addressFileName">No se ha seleccionado archivo</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Buró de Crédito</label>
+                        <div class="file-upload" id="creditUpload">
+                            <i class="fas fa-chart-line"></i>
+                            <p>Haz clic para subir reporte de buró de crédito</p>
+                            <input type="file" id="creditFile" accept=".pdf,.jpg,.jpeg,.png">
+                            <div class="file-name" id="creditFileName">No se ha seleccionado archivo</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Estado de Cuenta Bancario</label>
+                        <div class="file-upload" id="bankUpload">
+                            <i class="fas fa-university"></i>
+                            <p>Haz clic para subir estado de cuenta</p>
+                            <input type="file" id="bankFile" accept=".pdf,.jpg,.jpeg,.png">
+                            <div class="file-name" id="bankFileName">No se ha seleccionado archivo</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width: 100%;" id="submitDocumentsBtn">Enviar Solicitud</button>
                 </div>
             </section>
 
@@ -701,34 +878,55 @@
                     
                     <div class="form-group">
                         <label for="calcAmount" class="form-label">Monto que necesitas (MXN)</label>
-                        <input type="number" id="calcAmount" class="form-control" value="15000" min="1000" max="50000">
+                        <input type="number" id="calcAmount" class="form-control" value="3000" min="1000" max="5000">
                     </div>
                     
                     <div class="form-group">
                         <label for="calcTerm" class="form-label">Plazo de pago (meses)</label>
                         <select id="calcTerm" class="form-control">
                             <option value="3">3 meses</option>
-                            <option value="6">6 meses</option>
+                            <option value="4">4 meses</option>
+                            <option value="5">5 meses</option>
+                            <option value="6" selected>6 meses</option>
+                            <option value="7">7 meses</option>
+                            <option value="8">8 meses</option>
                             <option value="9">9 meses</option>
-                            <option value="12" selected>12 meses</option>
-                            <option value="18">18 meses</option>
-                            <option value="24">24 meses</option>
+                            <option value="10">10 meses</option>
+                            <option value="11">11 meses</option>
+                            <option value="12">12 meses</option>
                         </select>
                     </div>
                     
                     <div class="calculator-results">
                         <div class="result-item">
                             <span class="result-label">Pago mensual:</span>
-                            <span class="result-value" id="calcMonthly">$1,650</span>
+                            <span class="result-value" id="calcMonthly">$600</span>
                         </div>
                         <div class="result-item">
                             <span class="result-label">Interés total:</span>
-                            <span class="result-value" id="calcInterest">$4,800</span>
+                            <span class="result-value" id="calcInterest">$600</span>
                         </div>
                         <div class="result-item">
                             <span class="result-label">Total a pagar:</span>
-                            <span class="result-value" id="calcTotal">$19,800</span>
+                            <span class="result-value" id="calcTotal">$3,600</span>
                         </div>
+                    </div>
+                    
+                    <div class="amortization-table-container">
+                        <table class="amortization-table" id="amortizationTable">
+                            <thead>
+                                <tr>
+                                    <th>Mes</th>
+                                    <th>Pago</th>
+                                    <th>Interés</th>
+                                    <th>Capital</th>
+                                    <th>Saldo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="amortizationBody">
+                                <!-- Aquí se generará la tabla de amortización -->
+                            </tbody>
+                        </table>
                     </div>
                     
                     <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" id="applyFromCalcBtn">Solicitar este Crédito</button>
@@ -741,9 +939,9 @@
                     <div class="profile-avatar">
                         <i class="fas fa-user"></i>
                     </div>
-                    <h2 class="profile-name">Luis García</h2>
-                    <p class="profile-email">luis.garcia@email.com</p>
-                    <a href="#" class="btn btn-outline">Editar Perfil</a>
+                    <h2 class="profile-name" id="profileUserName">Usuario</h2>
+                    <p class="profile-email" id="profileUserEmail">usuario@email.com</p>
+                    <a href="#" class="btn btn-outline" id="editProfileBtn">Editar Perfil</a>
                 </div>
                 
                 <div class="card">
@@ -796,7 +994,7 @@
                                 <i class="fas fa-chevron-right"></i>
                             </div>
                         </a>
-                        <a href="#" class="menu-item">
+                        <a href="#" class="menu-item" id="logoutBtn">
                             <div class="menu-icon">
                                 <i class="fas fa-sign-out-alt"></i>
                             </div>
@@ -814,7 +1012,7 @@
         </main>
 
         <!-- Navegación Inferior -->
-        <nav class="bottom-nav">
+        <nav class="bottom-nav" style="display: none;" id="mainNav">
             <a href="#" class="nav-item active" data-page="homePage">
                 <i class="fas fa-home nav-icon"></i>
                 <span>Inicio</span>
@@ -835,10 +1033,16 @@
     </div>
 
     <script>
+        // Sistema de Usuarios
+        let currentUser = null;
+        let users = JSON.parse(localStorage.getItem('creditxpress_users')) || [];
+
         // DOM Elements
         const pages = document.querySelectorAll('.page');
         const navItems = document.querySelectorAll('.nav-item');
         const actionCards = document.querySelectorAll('.action-card');
+        const authTabs = document.querySelectorAll('.auth-tab');
+        const mainNav = document.getElementById('mainNav');
         
         // Elementos de la calculadora
         const loanAmountSlider = document.getElementById('loanAmount');
@@ -856,26 +1060,134 @@
         const calcMonthly = document.getElementById('calcMonthly');
         const calcInterest = document.getElementById('calcInterest');
         const calcTotal = document.getElementById('calcTotal');
+        const amortizationBody = document.getElementById('amortizationBody');
         
         // Botones de acción
         const quickLoanBtn = document.getElementById('quickLoanBtn');
         const viewCreditBtn = document.getElementById('viewCreditBtn');
-        const submitLoanBtn = document.getElementById('submitLoanBtn');
+        const showDocumentsBtn = document.getElementById('showDocumentsBtn');
+        const submitDocumentsBtn = document.getElementById('submitDocumentsBtn');
         const applyFromCalcBtn = document.getElementById('applyFromCalcBtn');
-        
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Sistema de Autenticación
+        function showAuthPage() {
+            showPage('authPage');
+            mainNav.style.display = 'none';
+        }
+
+        function showMainApp() {
+            showPage('homePage');
+            mainNav.style.display = 'flex';
+            updateUserInfo();
+        }
+
+        function updateUserInfo() {
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser.name.split(' ')[0];
+                document.getElementById('profileUserName').textContent = currentUser.name;
+                document.getElementById('profileUserEmail').textContent = currentUser.email;
+            }
+        }
+
+        // Login/Register Tabs
+        authTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                
+                authTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                document.getElementById('loginForm').style.display = tabName === 'login' ? 'block' : 'none';
+                document.getElementById('registerForm').style.display = tabName === 'register' ? 'block' : 'none';
+            });
+        });
+
+        // Login
+        loginBtn.addEventListener('click', () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('creditxpress_current_user', JSON.stringify(user));
+                showMainApp();
+                alert('¡Bienvenido de nuevo!');
+            } else {
+                alert('Credenciales incorrectas. Por favor verifica tu email y contraseña.');
+            }
+        });
+
+        // Register
+        registerBtn.addEventListener('click', () => {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const phone = document.getElementById('registerPhone').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('Las contraseñas no coinciden.');
+                return;
+            }
+            
+            if (users.find(u => u.email === email)) {
+                alert('Este email ya está registrado.');
+                return;
+            }
+            
+            const newUser = {
+                id: Date.now(),
+                name,
+                email,
+                phone,
+                password
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('creditxpress_users', JSON.stringify(users));
+            
+            currentUser = newUser;
+            localStorage.setItem('creditxpress_current_user', JSON.stringify(newUser));
+            
+            showMainApp();
+            alert('¡Cuenta creada exitosamente!');
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentUser = null;
+            localStorage.removeItem('creditxpress_current_user');
+            showAuthPage();
+            alert('Sesión cerrada correctamente.');
+        });
+
+        // Check if user is logged in on page load
+        window.addEventListener('load', () => {
+            const savedUser = localStorage.getItem('creditxpress_current_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showMainApp();
+            } else {
+                showAuthPage();
+            }
+        });
+
         // Navegación entre páginas
         function showPage(pageId) {
-            // Ocultar todas las páginas
             pages.forEach(page => {
                 page.classList.remove('active');
             });
             
-            // Mostrar la página seleccionada
             const activePage = document.getElementById(pageId);
             activePage.classList.add('active');
             activePage.classList.add('fade-in');
             
-            // Actualizar navegación activa
             navItems.forEach(item => {
                 item.classList.remove('active');
                 if (item.getAttribute('data-page') === pageId) {
@@ -883,27 +1195,35 @@
                 }
             });
         }
-        
+
         // Configurar event listeners para navegación
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
+                if (!currentUser) {
+                    showAuthPage();
+                    return;
+                }
                 const pageId = item.getAttribute('data-page');
                 showPage(pageId);
             });
         });
-        
+
         actionCards.forEach(card => {
             card.addEventListener('click', (e) => {
                 e.preventDefault();
+                if (!currentUser) {
+                    showAuthPage();
+                    return;
+                }
                 const pageId = card.getAttribute('data-page');
                 if (pageId) {
                     showPage(pageId);
                 }
             });
         });
-        
-        // Calculadora de préstamo
+
+        // Cálculo con Tasa Global (Interés Simple)
         function calculateLoan() {
             const amount = parseInt(loanAmountSlider.value);
             const term = parseInt(loanTermSlider.value);
@@ -912,100 +1232,144 @@
             loanAmountValue.textContent = `$${amount.toLocaleString()}`;
             loanTermValue.textContent = `${term} meses`;
             
-            // Tasas basadas en el monto y plazo
-            let annualRate;
-            if (amount <= 5000) {
-                annualRate = 0.75; // 75% anual para montos pequeños
-            } else if (amount <= 15000) {
-                annualRate = 0.60; // 60% anual
-            } else if (amount <= 30000) {
-                annualRate = 0.48; // 48% anual
-            } else {
-                annualRate = 0.36; // 36% anual para montos mayores
-            }
+            // Tasa global del 10% mensual (120% anual)
+            const monthlyRate = 0.10; // 10% mensual
+            const annualRate = monthlyRate * 12; // 120% anual
             
-            // Ajustar tasa según plazo
-            if (term > 12) {
-                annualRate *= 0.9; // 10% menos para plazos largos
-            }
+            // Cálculo con tasa global (interés simple)
+            const totalInterest = amount * monthlyRate * term;
+            const totalPaymentAmount = amount + totalInterest;
+            const monthlyPaymentAmount = totalPaymentAmount / term;
             
-            const monthlyRate = annualRate / 12;
-            
-            // Calcular cuota mensual
-            const monthly = (amount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -term));
-            const total = monthly * term;
-            
-            // Calcular CAT (aproximación)
-            const cat = (annualRate + 0.3) * 100; // Aproximación simplificada
+            // CAT aproximado (incluye comisiones)
+            const cat = (annualRate + 0.2) * 100;
             
             // Update display
-            monthlyPayment.textContent = `$${Math.round(monthly).toLocaleString()}`;
+            monthlyPayment.textContent = `$${Math.round(monthlyPaymentAmount).toLocaleString()}`;
             interestRate.textContent = `${Math.round(annualRate * 100)}%`;
             catRate.textContent = `${Math.round(cat)}%`;
-            totalPayment.textContent = `$${Math.round(total).toLocaleString()}`;
+            totalPayment.textContent = `$${Math.round(totalPaymentAmount).toLocaleString()}`;
         }
-        
-        // Calculadora independiente
+
+        // Calculadora independiente con tabla de amortización
         function updateCalculator() {
             const amount = parseInt(calcAmount.value);
             const term = parseInt(calcTerm.value);
             
-            // Tasas basadas en el monto y plazo
-            let annualRate;
-            if (amount <= 5000) {
-                annualRate = 0.75;
-            } else if (amount <= 15000) {
-                annualRate = 0.60;
-            } else if (amount <= 30000) {
-                annualRate = 0.48;
-            } else {
-                annualRate = 0.36;
-            }
-            
-            // Ajustar tasa según plazo
-            if (term > 12) {
-                annualRate *= 0.9;
-            }
-            
-            const monthlyRate = annualRate / 12;
-            
-            // Calcular cuota mensual
-            const monthly = (amount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -term));
-            const total = monthly * term;
-            const interest = total - amount;
+            // Tasa global del 10% mensual
+            const monthlyRate = 0.10;
+            const totalInterest = amount * monthlyRate * term;
+            const totalPaymentAmount = amount + totalInterest;
+            const monthlyPaymentAmount = totalPaymentAmount / term;
             
             // Update display
-            calcMonthly.textContent = `$${Math.round(monthly).toLocaleString()}`;
-            calcInterest.textContent = `$${Math.round(interest).toLocaleString()}`;
-            calcTotal.textContent = `$${Math.round(total).toLocaleString()}`;
+            calcMonthly.textContent = `$${Math.round(monthlyPaymentAmount).toLocaleString()}`;
+            calcInterest.textContent = `$${Math.round(totalInterest).toLocaleString()}`;
+            calcTotal.textContent = `$${Math.round(totalPaymentAmount).toLocaleString()}`;
+            
+            // Generar tabla de amortización
+            generateAmortizationTable(amount, term, monthlyRate, monthlyPaymentAmount);
         }
-        
+
+        // Generar tabla de amortización
+        function generateAmortizationTable(amount, term, monthlyRate, monthlyPayment) {
+            let balance = amount;
+            let html = '';
+            
+            for (let month = 1; month <= term; month++) {
+                const interest = balance * monthlyRate;
+                const principal = monthlyPayment - interest;
+                balance -= principal;
+                
+                // En el último mes, ajustar para que el saldo sea 0
+                const finalBalance = month === term ? 0 : Math.max(0, balance);
+                
+                html += `
+                    <tr>
+                        <td>${month}</td>
+                        <td>$${Math.round(monthlyPayment).toLocaleString()}</td>
+                        <td>$${Math.round(interest).toLocaleString()}</td>
+                        <td>$${Math.round(principal).toLocaleString()}</td>
+                        <td>$${Math.round(finalBalance).toLocaleString()}</td>
+                    </tr>
+                `;
+            }
+            
+            amortizationBody.innerHTML = html;
+        }
+
         // Inicializar calculadoras
         calculateLoan();
         updateCalculator();
-        
+
         // Event listeners para calculadoras
         loanAmountSlider.addEventListener('input', calculateLoan);
         loanTermSlider.addEventListener('input', calculateLoan);
         calcAmount.addEventListener('input', updateCalculator);
         calcTerm.addEventListener('change', updateCalculator);
-        
+
+        // Sistema de subida de archivos
+        const fileUploads = [
+            { id: 'idUpload', fileInput: 'idFile', fileName: 'idFileName' },
+            { id: 'addressUpload', fileInput: 'addressFile', fileName: 'addressFileName' },
+            { id: 'creditUpload', fileInput: 'creditFile', fileName: 'creditFileName' },
+            { id: 'bankUpload', fileInput: 'bankFile', fileName: 'bankFileName' }
+        ];
+
+        fileUploads.forEach(upload => {
+            const uploadElement = document.getElementById(upload.id);
+            const fileInput = document.getElementById(upload.fileInput);
+            const fileName = document.getElementById(upload.fileName);
+            
+            uploadElement.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    fileName.textContent = e.target.files[0].name;
+                }
+            });
+        });
+
         // Botones de acción
         quickLoanBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            if (!currentUser) {
+                showAuthPage();
+                return;
+            }
             showPage('loanPage');
         });
-        
+
         viewCreditBtn.addEventListener('click', (e) => {
             e.preventDefault();
             alert('Aquí verías los detalles de tu crédito actual');
         });
-        
-        submitLoanBtn.addEventListener('click', (e) => {
+
+        showDocumentsBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            alert('¡Solicitud enviada! Revisaremos tu información y te contactaremos pronto.');
+            showPage('documentsPage');
         });
-        
+
+        submitDocumentsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Verificar que todos los archivos estén subidos
+            const idFile = document.getElementById('idFile').files[0];
+            const addressFile = document.getElementById('addressFile').files[0];
+            const creditFile = document.getElementById('creditFile').files[0];
+            const bankFile = document.getElementById('bankFile').files[0];
+            
+            if (!idFile || !addressFile || !creditFile || !bankFile) {
+                alert('Por favor sube todos los documentos requeridos.');
+                return;
+            }
+            
+            alert('¡Solicitud enviada! Revisaremos tu información y te contactaremos pronto.');
+            showPage('homePage');
+        });
+
         applyFromCalcBtn.addEventListener('click', (e) => {
             e.preventDefault();
             // Llenar el formulario de préstamo con los valores de la calculadora
@@ -1014,14 +1378,6 @@
             calculateLoan();
             showPage('loanPage');
         });
-        
-        // Service Worker para PWA (simulado)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                // En un caso real, aquí registrarías tu service worker
-                console.log('CreditXpress App está lista para funcionar offline');
-            });
-        }
     </script>
 </body>
 </html>
