@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreditXpress App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a5276">
+    <style>
+        :root {
+            --primary: #1a5276;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
+            --gray: #7f8c8d;
+            --text: #333333;
+            --border: #e0e0e0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            height: 100vh;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        #app {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+        }
+        
+        /* Header de la App */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 1.4rem;
+            margin-left: 10px;
+            font-weight: 700;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .header-icon {
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        /* Navegación Inferior */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray);
+            font-size: 0.8rem;
+            flex: 1;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+        
+        /* Contenido Principal */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            padding-bottom: 70px; /* Espacio para la navegación inferior */
+        }
+        
+        /* Tarjetas */
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Sección de Bienvenida */
+        .welcome-section {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .welcome-text h2 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-text p {
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Botones */
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-outline:hover {
+            background-color: white;
+            color: var(--primary);
+        }
+        
+        /* Estado de Crédito */
+        .credit-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .credit-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .credit-info {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* Acciones Rápidas */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .action-card {
+            background-color: var(--light);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .action-icon {
+            font-size: 1.8rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .action-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        /* Historial de Transacciones */
+        .transaction-list {
+            list-style: none;
+        }
+        
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary);
+        }
+        
+        .transaction-details h4 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .transaction-details p {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .transaction-amount {
+            font-weight: 600;
+        }
+        
+        .positive {
+            color: var(--success);
+        }
+        
+        .negative {
+            color: var(--accent);
+        }
+        
+        /* Página de Solicitud de Crédito */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--light);
+        }
+        
+        .range-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .range-value {
+            min-width: 80px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .calculator-results {
+            background-color: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .result-label {
+            color: var(--gray);
+        }
+        
+        .result-value {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        /* Página de Perfil */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 2.5rem;
+        }
+        
+        .profile-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-email {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+        
+        .menu-list {
+            list-style: none;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+            text-decoration: none;
+            color: var(--text);
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary);
+        }
+        
+        .menu-text {
+            flex: 1;
+        }
+        
+        .menu-text h3 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .menu-text p {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .menu-arrow {
+            color: var(--gray);
+        }
+        
+        /* Estados de Página */
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* Notificaciones */
+        .notification-badge {
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
+        
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+        
+        /* Responsive */
+        @media (max-width: 380px) {
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-icon">💳</span>
+                    <h1>CreditXpress</h1>
+                </div>
+            </div>
+            <div class="header-right">
+                <a href="#" class="header-icon" id="notificationsBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Contenido Principal -->
+        <main class="app-content">
+            <!-- Página de Inicio -->
+            <section id="homePage" class="page active">
+                <div class="welcome-section">
+                    <div class="welcome-text">
+                        <h2>¡Hola, Luis!</h2>
+                        <p>Tu crédito preaprobado está listo</p>
+                    </div>
+                    <a href="#" class="btn btn-primary" id="quickLoanBtn">Solicitar $15,000</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Tu Crédito</h3>
+                    </div>
+                    <div class="credit-status">
+                        <div>
+                            <div class="credit-amount">$15,000</div>
+                            <div class="credit-info">Límite preaprobado</div>
+                        </div>
+                        <div>
+                            <div class="credit-amount">$0</div>
+                            <div class="credit-info">Saldo utilizado</div>
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-primary" id="viewCreditBtn">Ver Detalles</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Acciones Rápidas</h3>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="#" class="action-card" data-page="loanPage">
+                            <div class="action-icon">
+                                <i class="fas fa-hand-holding-usd"></i>
+                            </div>
+                            <div class="action-title">Solicitar Crédito</div>
+                        </a>
+                        <a href="#" class="action-card" data-page="calculatorPage">
+                            <div class="action-icon">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <div class="action-title">Calculadora</div>
+                        </a>
+                        <a href="#" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div class="action-title">Historial</div>
+                        </a>
+                        <a href="#" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-qrcode"></i>
+                            </div>
+                            <div class="action-title">Pagar</div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Últimas Transacciones</h3>
+                        <a href="#" style="color: var(--primary); font-size: 0.9rem;">Ver todo</a>
+                    </div>
+                    <ul class="transaction-list">
+                        <li class="transaction-item">
+                            <div class="transaction-info">
+                                <div class="transaction-icon">
+                                    <i class="fas fa-arrow-down"></i>
+                                </div>
+                                <div class="transaction-details">
+                                    <h4>Préstamo Aprobado</h4>
+                                    <p>15 Oct 2023</p>
+                                </div>
+                            </div>
+                            <div class="transaction-amount positive">+$10,000</div>
+                        </li>
+                        <li class="transaction-item">
+                            <div class="transaction-info">
+                                <div class="transaction-icon">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <div class="transaction-details">
+                                    <h4>Compra en Amazon</h4>
+                                    <p>12 Oct 2023</p>
+                                </div>
+                            </div>
+                            <div class="transaction-amount negative">-$1,250</div>
+                        </li>
+                        <li class="transaction-item">
+                            <div class="transaction-info">
+                                <div class="transaction-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="transaction-details">
+                                    <h4>Pago de Telcel</h4>
+                                    <p>10 Oct 2023</p>
+                                </div>
+                            </div>
+                            <div class="transaction-amount negative">-$500</div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Página de Solicitud de Crédito -->
+            <section id="loanPage" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Solicitar Crédito</h3>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loanAmount" class="form-label">Monto del préstamo (MXN)</label>
+                        <div class="range-container">
+                            <input type="range" id="loanAmount" min="1000" max="50000" step="1000" value="15000" class="form-control">
+                            <span class="range-value" id="loanAmountValue">$15,000</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loanTerm" class="form-label">Plazo (meses)</label>
+                        <div class="range-container">
+                            <input type="range" id="loanTerm" min="3" max="24" step="1" value="12" class="form-control">
+                            <span class="range-value" id="loanTermValue">12 meses</span>
+                        </div>
+                    </div>
+                    
+                    <div class="calculator-results">
+                        <div class="result-item">
+                            <span class="result-label">Cuota mensual:</span>
+                            <span class="result-value" id="monthlyPayment">$1,650</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Tasa de interés anual:</span>
+                            <span class="result-value" id="interestRate">48%</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">CAT promedio:</span>
+                            <span class="result-value" id="catRate">120.5%</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Total a pagar:</span>
+                            <span class="result-value" id="totalPayment">$19,800</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" id="submitLoanBtn">Solicitar este Crédito</button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Requisitos</h3>
+                    </div>
+                    <ul style="padding-left: 1.5rem;">
+                        <li style="margin-bottom: 0.5rem;">Ser mayor de 18 años</li>
+                        <li style="margin-bottom: 0.5rem;">Identificación oficial vigente</li>
+                        <li style="margin-bottom: 0.5rem;">Comprobante de domicilio</li>
+                        <li style="margin-bottom: 0.5rem;">Comprobante de ingresos</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Página de Calculadora -->
+            <section id="calculatorPage" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Calculadora de Crédito</h3>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="calcAmount" class="form-label">Monto que necesitas (MXN)</label>
+                        <input type="number" id="calcAmount" class="form-control" value="15000" min="1000" max="50000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="calcTerm" class="form-label">Plazo de pago (meses)</label>
+                        <select id="calcTerm" class="form-control">
+                            <option value="3">3 meses</option>
+                            <option value="6">6 meses</option>
+                            <option value="9">9 meses</option>
+                            <option value="12" selected>12 meses</option>
+                            <option value="18">18 meses</option>
+                            <option value="24">24 meses</option>
+                        </select>
+                    </div>
+                    
+                    <div class="calculator-results">
+                        <div class="result-item">
+                            <span class="result-label">Pago mensual:</span>
+                            <span class="result-value" id="calcMonthly">$1,650</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Interés total:</span>
+                            <span class="result-value" id="calcInterest">$4,800</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Total a pagar:</span>
+                            <span class="result-value" id="calcTotal">$19,800</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" id="applyFromCalcBtn">Solicitar este Crédito</button>
+                </div>
+            </section>
+
+            <!-- Página de Perfil -->
+            <section id="profilePage" class="page">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h2 class="profile-name">Luis García</h2>
+                    <p class="profile-email">luis.garcia@email.com</p>
+                    <a href="#" class="btn btn-outline">Editar Perfil</a>
+                </div>
+                
+                <div class="card">
+                    <ul class="menu-list">
+                        <a href="#" class="menu-item">
+                            <div class="menu-icon">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div class="menu-text">
+                                <h3>Datos Personales</h3>
+                                <p>Gestiona tu información personal</p>
+                            </div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        <a href="#" class="menu-item">
+                            <div class="menu-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div class="menu-text">
+                                <h3>Seguridad</h3>
+                                <p>Cambia tu contraseña y PIN</p>
+                            </div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        <a href="#" class="menu-item">
+                            <div class="menu-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="menu-text">
+                                <h3>Notificaciones</h3>
+                                <p>Configura tus alertas</p>
+                            </div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        <a href="#" class="menu-item">
+                            <div class="menu-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="menu-text">
+                                <h3>Ayuda y Soporte</h3>
+                                <p>Centro de ayuda y contacto</p>
+                            </div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        <a href="#" class="menu-item">
+                            <div class="menu-icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </div>
+                            <div class="menu-text">
+                                <h3>Cerrar Sesión</h3>
+                                <p>Salir de tu cuenta</p>
+                            </div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <!-- Navegación Inferior -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" data-page="homePage">
+                <i class="fas fa-home nav-icon"></i>
+                <span>Inicio</span>
+            </a>
+            <a href="#" class="nav-item" data-page="loanPage">
+                <i class="fas fa-hand-holding-usd nav-icon"></i>
+                <span>Crédito</span>
+            </a>
+            <a href="#" class="nav-item" data-page="calculatorPage">
+                <i class="fas fa-calculator nav-icon"></i>
+                <span>Calcular</span>
+            </a>
+            <a href="#" class="nav-item" data-page="profilePage">
+                <i class="fas fa-user nav-icon"></i>
+                <span>Perfil</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // DOM Elements
+        const pages = document.querySelectorAll('.page');
+        const navItems = document.querySelectorAll('.nav-item');
+        const actionCards = document.querySelectorAll('.action-card');
+        
+        // Elementos de la calculadora
+        const loanAmountSlider = document.getElementById('loanAmount');
+        const loanTermSlider = document.getElementById('loanTerm');
+        const loanAmountValue = document.getElementById('loanAmountValue');
+        const loanTermValue = document.getElementById('loanTermValue');
+        const monthlyPayment = document.getElementById('monthlyPayment');
+        const interestRate = document.getElementById('interestRate');
+        const catRate = document.getElementById('catRate');
+        const totalPayment = document.getElementById('totalPayment');
+        
+        // Elementos de la calculadora independiente
+        const calcAmount = document.getElementById('calcAmount');
+        const calcTerm = document.getElementById('calcTerm');
+        const calcMonthly = document.getElementById('calcMonthly');
+        const calcInterest = document.getElementById('calcInterest');
+        const calcTotal = document.getElementById('calcTotal');
+        
+        // Botones de acción
+        const quickLoanBtn = document.getElementById('quickLoanBtn');
+        const viewCreditBtn = document.getElementById('viewCreditBtn');
+        const submitLoanBtn = document.getElementById('submitLoanBtn');
+        const applyFromCalcBtn = document.getElementById('applyFromCalcBtn');
+        
+        // Navegación entre páginas
+        function showPage(pageId) {
+            // Ocultar todas las páginas
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Mostrar la página seleccionada
+            const activePage = document.getElementById(pageId);
+            activePage.classList.add('active');
+            activePage.classList.add('fade-in');
+            
+            // Actualizar navegación activa
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-page') === pageId) {
+                    item.classList.add('active');
+                }
+            });
+        }
+        
+        // Configurar event listeners para navegación
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = item.getAttribute('data-page');
+                showPage(pageId);
+            });
+        });
+        
+        actionCards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = card.getAttribute('data-page');
+                if (pageId) {
+                    showPage(pageId);
+                }
+            });
+        });
+        
+        // Calculadora de préstamo
+        function calculateLoan() {
+            const amount = parseInt(loanAmountSlider.value);
+            const term = parseInt(loanTermSlider.value);
+            
+            // Format values for display
+            loanAmountValue.textContent = `$${amount.toLocaleString()}`;
+            loanTermValue.textContent = `${term} meses`;
+            
+            // Tasas basadas en el monto y plazo
+            let annualRate;
+            if (amount <= 5000) {
+                annualRate = 0.75; // 75% anual para montos pequeños
+            } else if (amount <= 15000) {
+                annualRate = 0.60; // 60% anual
+            } else if (amount <= 30000) {
+                annualRate = 0.48; // 48% anual
+            } else {
+                annualRate = 0.36; // 36% anual para montos mayores
+            }
+            
+            // Ajustar tasa según plazo
+            if (term > 12) {
+                annualRate *= 0.9; // 10% menos para plazos largos
+            }
+            
+            const monthlyRate = annualRate / 12;
+            
+            // Calcular cuota mensual
+            const monthly = (amount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -term));
+            const total = monthly * term;
+            
+            // Calcular CAT (aproximación)
+            const cat = (annualRate + 0.3) * 100; // Aproximación simplificada
+            
+            // Update display
+            monthlyPayment.textContent = `$${Math.round(monthly).toLocaleString()}`;
+            interestRate.textContent = `${Math.round(annualRate * 100)}%`;
+            catRate.textContent = `${Math.round(cat)}%`;
+            totalPayment.textContent = `$${Math.round(total).toLocaleString()}`;
+        }
+        
+        // Calculadora independiente
+        function updateCalculator() {
+            const amount = parseInt(calcAmount.value);
+            const term = parseInt(calcTerm.value);
+            
+            // Tasas basadas en el monto y plazo
+            let annualRate;
+            if (amount <= 5000) {
+                annualRate = 0.75;
+            } else if (amount <= 15000) {
+                annualRate = 0.60;
+            } else if (amount <= 30000) {
+                annualRate = 0.48;
+            } else {
+                annualRate = 0.36;
+            }
+            
+            // Ajustar tasa según plazo
+            if (term > 12) {
+                annualRate *= 0.9;
+            }
+            
+            const monthlyRate = annualRate / 12;
+            
+            // Calcular cuota mensual
+            const monthly = (amount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -term));
+            const total = monthly * term;
+            const interest = total - amount;
+            
+            // Update display
+            calcMonthly.textContent = `$${Math.round(monthly).toLocaleString()}`;
+            calcInterest.textContent = `$${Math.round(interest).toLocaleString()}`;
+            calcTotal.textContent = `$${Math.round(total).toLocaleString()}`;
+        }
+        
+        // Inicializar calculadoras
+        calculateLoan();
+        updateCalculator();
+        
+        // Event listeners para calculadoras
+        loanAmountSlider.addEventListener('input', calculateLoan);
+        loanTermSlider.addEventListener('input', calculateLoan);
+        calcAmount.addEventListener('input', updateCalculator);
+        calcTerm.addEventListener('change', updateCalculator);
+        
+        // Botones de acción
+        quickLoanBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('loanPage');
+        });
+        
+        viewCreditBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Aquí verías los detalles de tu crédito actual');
+        });
+        
+        submitLoanBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('¡Solicitud enviada! Revisaremos tu información y te contactaremos pronto.');
+        });
+        
+        applyFromCalcBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Llenar el formulario de préstamo con los valores de la calculadora
+            loanAmountSlider.value = calcAmount.value;
+            loanTermSlider.value = calcTerm.value;
+            calculateLoan();
+            showPage('loanPage');
+        });
+        
+        // Service Worker para PWA (simulado)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                // En un caso real, aquí registrarías tu service worker
+                console.log('CreditXpress App está lista para funcionar offline');
+            });
+        }
+    </script>
+</body>
+</html>
