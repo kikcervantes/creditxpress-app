@@ -1352,23 +1352,102 @@
             showPage('documentsPage');
         });
 
-        submitDocumentsBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Verificar que todos los archivos estén subidos
-            const idFile = document.getElementById('idFile').files[0];
-            const addressFile = document.getElementById('addressFile').files[0];
-            const creditFile = document.getElementById('creditFile').files[0];
-            const bankFile = document.getElementById('bankFile').files[0];
-            
-            if (!idFile || !addressFile || !creditFile || !bankFile) {
-                alert('Por favor sube todos los documentos requeridos.');
-                return;
-            }
-            
-            alert('¡Solicitud enviada! Revisaremos tu información y te contactaremos pronto.');
-            showPage('homePage');
-        });
+// =============================================
+// NUEVA FUNCIÓN: GUARDAR SOLICITUD EN CRM
+// =============================================
+function saveCreditRequest(amount, term, documents) {
+    const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+    
+    const newRequest = {
+        id: Date.now(),
+        clientName: currentUser.name,
+        clientEmail: currentUser.email,
+        clientPhone: currentUser.phone,
+        amount: amount,
+        term: term,
+        status: 'pending',
+        timestamp: new Date().toISOString(),
+        documents: documents
+    };
+    
+    requests.push(newRequest);
+    localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
+    
+    console.log('Solicitud guardada en CRM:', newRequest);
+    return newRequest.id;
+}
+
+// =============================================
+// BOTÓN MODIFICADO: ENVIAR AL CRM
+// =============================================
+submitDocumentsBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // 1. VERIFICAR QUE ESTÉ LOGUEADO
+    if (!currentUser) {
+        alert('Debes iniciar sesión primero');
+        showPage('authPage');
+        return;
+    }
+    
+    // 2. VERIFICAR ARCHIVOS
+    const idFile = document.getElementById('idFile').files[0];
+    const addressFile = document.getElementById('addressFile').files[0];
+    const creditFile = document.getElementById('creditFile').files[0];
+    const bankFile = document.getElementById('bankFile').files[0];
+    
+    if (!idFile || !addressFile || !creditFile || !bankFile) {
+        alert('❌ Por favor sube TODOS los documentos requeridos.');
+        return;
+    }
+    
+    // 3. OBTENER DATOS DEL PRÉSTAMO
+    const loanAmount = parseInt(document.getElementById('loanAmount').value);
+    const loanTerm = parseInt(document.getElementById('loanTerm').value);
+    
+    // 4. CREAR OBJETO DE DOCUMENTOS
+    const documents = {
+        identification: { 
+            type: idFile.type.includes('image') ? 'image' : 'pdf',
+            name: idFile.name,
+            url: 'https://via.placeholder.com/400x300?text=INE_' + currentUser.name.split(' ')[0]
+        },
+        address: { 
+            type: addressFile.type.includes('image') ? 'image' : 'pdf',
+            name: addressFile.name,
+            url: 'https://via.placeholder.com/400x300?text=DOMICILIO_' + currentUser.name.split(' ')[0]
+        },
+        credit: { 
+            type: 'pdf',
+            name: creditFile.name,
+            url: 'https://via.placeholder.com/400x300?text=BURÓ_CRÉDITO'
+        },
+        bank: { 
+            type: 'pdf',
+            name: bankFile.name,
+            url: 'https://via.placeholder.com/400x300?text=ESTADO_CUENTA'
+        }
+    };
+    
+    // 5. GUARDAR EN CRM
+    const requestId = saveCreditRequest(loanAmount, loanTerm, documents);
+    
+    // 6. MOSTRAR CONFIRMACIÓN
+    alert(`✅ ¡Solicitud #${requestId} enviada al CRM!\n\nNuestro equipo la revisará y te contactaremos pronto.`);
+    
+    // 7. LIMPIAR FORMULARIO Y VOLVER AL INICIO
+    document.getElementById('idFile').value = '';
+    document.getElementById('addressFile').value = '';
+    document.getElementById('creditFile').value = '';
+    document.getElementById('bankFile').value = '';
+    
+    // Actualizar nombres de archivos
+    document.querySelectorAll('.file-name').forEach(el => {
+        el.textContent = 'No se ha seleccionado archivo';
+    });
+    
+    showPage('homePage');
+});
 
         applyFromCalcBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -1381,3 +1460,4 @@
     </script>
 </body>
 </html>
+
