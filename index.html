@@ -164,6 +164,14 @@
             padding: 1.5rem;
             margin-bottom: 1.5rem;
         }
+
+        .welcome-section.approved {
+            background: linear-gradient(135deg, var(--success), #2ecc71);
+        }
+
+        .welcome-section.rejected {
+            background: linear-gradient(135deg, var(--accent), #e67e22);
+        }
         
         .welcome-text h2 {
             font-size: 1.4rem;
@@ -197,6 +205,16 @@
         
         .btn-primary:hover {
             background-color: #c0392b;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-success:hover {
+            background-color: #219653;
         }
         
         .btn-outline {
@@ -232,6 +250,36 @@
         .credit-info {
             color: var(--gray);
             font-size: 0.9rem;
+        }
+
+        /* Badges de estado */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-approved {
+            background: #d1edff;
+            color: var(--primary);
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
         }
         
         /* Acciones Rápidas */
@@ -612,7 +660,7 @@
             <div class="header-right">
                 <a href="#" class="header-icon" id="notificationsBtn">
                     <i class="fas fa-bell"></i>
-                    <span class="notification-badge">3</span>
+                    <span class="notification-badge" id="notificationCount">0</span>
                 </a>
             </div>
         </header>
@@ -669,29 +717,32 @@
 
             <!-- Página de Inicio -->
             <section id="homePage" class="page">
-                <div class="welcome-section">
+                <!-- Sección de Estado del Crédito -->
+                <div class="welcome-section" id="creditStatusSection">
                     <div class="welcome-text">
                         <h2>¡Hola, <span id="userName">Usuario</span>!</h2>
-                        <p>Tu crédito preaprobado está listo</p>
+                        <p id="statusMessage">Tu crédito preaprobado está listo</p>
                     </div>
-                    <a href="#" class="btn btn-primary" id="quickLoanBtn">Solicitar $5,000</a>
+                    <button class="btn btn-primary" id="quickLoanBtn">Solicitar $5,000</button>
                 </div>
 
-                <div class="card">
+                <!-- Información del Crédito Actual -->
+                <div class="card" id="currentCreditCard" style="display: none;">
                     <div class="card-header">
-                        <h3 class="card-title">Tu Crédito</h3>
+                        <h3 class="card-title">Tu Crédito Actual</h3>
+                        <span class="status-badge" id="currentCreditStatus">Pendiente</span>
                     </div>
                     <div class="credit-status">
                         <div>
-                            <div class="credit-amount">$5,000</div>
-                            <div class="credit-info">Límite preaprobado</div>
+                            <div class="credit-amount" id="currentCreditAmount">$0</div>
+                            <div class="credit-info">Monto aprobado</div>
                         </div>
                         <div>
-                            <div class="credit-amount">$0</div>
-                            <div class="credit-info">Saldo utilizado</div>
+                            <div class="credit-amount" id="currentCreditTerm">0 meses</div>
+                            <div class="credit-info">Plazo</div>
                         </div>
                     </div>
-                    <a href="#" class="btn btn-primary" id="viewCreditBtn">Ver Detalles</a>
+                    <button class="btn btn-secondary" id="viewCreditDetailsBtn">Ver Detalles</button>
                 </div>
 
                 <div class="card">
@@ -711,11 +762,11 @@
                             </div>
                             <div class="action-title">Calculadora</div>
                         </a>
-                        <a href="#" class="action-card">
+                        <a href="#" class="action-card" data-page="requestsPage">
                             <div class="action-icon">
                                 <i class="fas fa-history"></i>
                             </div>
-                            <div class="action-title">Historial</div>
+                            <div class="action-title">Mis Solicitudes</div>
                         </a>
                         <a href="#" class="action-card">
                             <div class="action-icon">
@@ -731,44 +782,21 @@
                         <h3 class="card-title">Últimas Transacciones</h3>
                         <a href="#" style="color: var(--primary); font-size: 0.9rem;">Ver todo</a>
                     </div>
-                    <ul class="transaction-list">
-                        <li class="transaction-item">
-                            <div class="transaction-info">
-                                <div class="transaction-icon">
-                                    <i class="fas fa-arrow-down"></i>
-                                </div>
-                                <div class="transaction-details">
-                                    <h4>Préstamo Aprobado</h4>
-                                    <p>15 Oct 2023</p>
-                                </div>
-                            </div>
-                            <div class="transaction-amount positive">+$5,000</div>
-                        </li>
-                        <li class="transaction-item">
-                            <div class="transaction-info">
-                                <div class="transaction-icon">
-                                    <i class="fas fa-shopping-cart"></i>
-                                </div>
-                                <div class="transaction-details">
-                                    <h4>Compra en Amazon</h4>
-                                    <p>12 Oct 2023</p>
-                                </div>
-                            </div>
-                            <div class="transaction-amount negative">-$1,250</div>
-                        </li>
-                        <li class="transaction-item">
-                            <div class="transaction-info">
-                                <div class="transaction-icon">
-                                    <i class="fas fa-mobile-alt"></i>
-                                </div>
-                                <div class="transaction-details">
-                                    <h4>Pago de Telcel</h4>
-                                    <p>10 Oct 2023</p>
-                                </div>
-                            </div>
-                            <div class="transaction-amount negative">-$500</div>
-                        </li>
+                    <ul class="transaction-list" id="transactionsList">
+                        <!-- Las transacciones se cargarán dinámicamente -->
                     </ul>
+                </div>
+            </section>
+
+            <!-- Página de Mis Solicitudes -->
+            <section id="requestsPage" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Mis Solicitudes de Crédito</h3>
+                    </div>
+                    <div id="userRequestsList">
+                        <!-- Las solicitudes del usuario se cargarán aquí -->
+                    </div>
                 </div>
             </section>
 
@@ -946,6 +974,18 @@
                 
                 <div class="card">
                     <ul class="menu-list">
+                        <a href="#" class="menu-item" data-page="requestsPage">
+                            <div class="menu-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="menu-text">
+                                <h3>Mis Solicitudes</h3>
+                                <p>Historial de créditos solicitados</p>
+                            </div>
+                            <div class="menu-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
                         <a href="#" class="menu-item">
                             <div class="menu-icon">
                                 <i class="fas fa-user-shield"></i>
@@ -1064,7 +1104,7 @@
         
         // Botones de acción
         const quickLoanBtn = document.getElementById('quickLoanBtn');
-        const viewCreditBtn = document.getElementById('viewCreditBtn');
+        const viewCreditDetailsBtn = document.getElementById('viewCreditDetailsBtn');
         const showDocumentsBtn = document.getElementById('showDocumentsBtn');
         const submitDocumentsBtn = document.getElementById('submitDocumentsBtn');
         const applyFromCalcBtn = document.getElementById('applyFromCalcBtn');
@@ -1072,7 +1112,210 @@
         const registerBtn = document.getElementById('registerBtn');
         const logoutBtn = document.getElementById('logoutBtn');
 
-        // Sistema de Autenticación
+        // =============================================
+        // NUEVAS FUNCIONES PARA MOSTRAR ESTADO DEL CRÉDITO
+        // =============================================
+
+        // Función para cargar el estado del crédito del usuario
+        function loadUserCreditStatus() {
+            if (!currentUser) return;
+
+            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+            const userRequests = requests.filter(req => req.clientEmail === currentUser.email);
+            
+            const approvedRequest = userRequests.find(req => req.status === 'approved');
+            const pendingRequest = userRequests.find(req => req.status === 'pending');
+            const rejectedRequest = userRequests.find(req => req.status === 'rejected');
+            
+            const creditStatusSection = document.getElementById('creditStatusSection');
+            const currentCreditCard = document.getElementById('currentCreditCard');
+            const statusMessage = document.getElementById('statusMessage');
+            const quickLoanBtn = document.getElementById('quickLoanBtn');
+            
+            // Actualizar notificaciones
+            const notificationCount = userRequests.filter(req => 
+                req.status === 'approved' || req.status === 'rejected'
+            ).length;
+            document.getElementById('notificationCount').textContent = notificationCount;
+
+            if (approvedRequest) {
+                // Usuario tiene un crédito aprobado
+                creditStatusSection.className = 'welcome-section approved';
+                statusMessage.innerHTML = `✅ <strong>¡Felicidades!</strong><br>Tu crédito ha sido aprobado`;
+                quickLoanBtn.textContent = 'Solicitar Otro Crédito';
+                quickLoanBtn.className = 'btn btn-success';
+                
+                // Mostrar información del crédito actual
+                currentCreditCard.style.display = 'block';
+                document.getElementById('currentCreditAmount').textContent = `$${approvedRequest.amount.toLocaleString()}`;
+                document.getElementById('currentCreditTerm').textContent = `${approvedRequest.term} meses`;
+                document.getElementById('currentCreditStatus').textContent = 'Aprobado';
+                document.getElementById('currentCreditStatus').className = 'status-badge status-approved';
+                
+            } else if (pendingRequest) {
+                // Usuario tiene una solicitud pendiente
+                creditStatusSection.className = 'welcome-section';
+                statusMessage.innerHTML = `⏳ <strong>Solicitud en revisión</strong><br>Estamos procesando tu solicitud #${pendingRequest.id}`;
+                quickLoanBtn.textContent = 'Ver Estado';
+                quickLoanBtn.className = 'btn btn-secondary';
+                
+            } else if (rejectedRequest) {
+                // Usuario tiene una solicitud rechazada
+                creditStatusSection.className = 'welcome-section rejected';
+                statusMessage.innerHTML = `❌ <strong>Solicitud rechazada</strong><br>Tu solicitud #${rejectedRequest.id} no fue aprobada`;
+                quickLoanBtn.textContent = 'Nueva Solicitud';
+                quickLoanBtn.className = 'btn btn-primary';
+                
+            } else {
+                // Usuario no tiene solicitudes
+                creditStatusSection.className = 'welcome-section';
+                statusMessage.textContent = 'Tu crédito preaprobado está listo';
+                quickLoanBtn.textContent = 'Solicitar $5,000';
+                quickLoanBtn.className = 'btn btn-primary';
+                currentCreditCard.style.display = 'none';
+            }
+            
+            // Cargar historial de transacciones
+            loadTransactionHistory(userRequests);
+            
+            // Cargar lista de solicitudes
+            loadUserRequests(userRequests);
+        }
+
+        // Función para cargar el historial de transacciones
+        function loadTransactionHistory(userRequests) {
+            const transactionsList = document.getElementById('transactionsList');
+            transactionsList.innerHTML = '';
+            
+            // Ordenar solicitudes por fecha (más reciente primero)
+            userRequests.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            // Mostrar las últimas 3 solicitudes como transacciones
+            userRequests.slice(0, 3).forEach(request => {
+                const transactionItem = document.createElement('li');
+                transactionItem.className = 'transaction-item';
+                
+                let icon = 'fa-file-alt';
+                let amountClass = 'negative';
+                let description = `Solicitud #${request.id}`;
+                
+                if (request.status === 'approved') {
+                    icon = 'fa-check-circle';
+                    amountClass = 'positive';
+                    description = 'Crédito Aprobado';
+                } else if (request.status === 'rejected') {
+                    icon = 'fa-times-circle';
+                    description = 'Solicitud Rechazada';
+                }
+                
+                transactionItem.innerHTML = `
+                    <div class="transaction-info">
+                        <div class="transaction-icon">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div class="transaction-details">
+                            <h4>${description}</h4>
+                            <p>${new Date(request.timestamp).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                    <div class="transaction-amount ${amountClass}">
+                        ${request.status === 'approved' ? '+' : ''}$${request.amount.toLocaleString()}
+                    </div>
+                `;
+                
+                transactionsList.appendChild(transactionItem);
+            });
+            
+            // Si no hay solicitudes, mostrar mensaje
+            if (userRequests.length === 0) {
+                transactionsList.innerHTML = `
+                    <li class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-details">
+                                <h4>No hay solicitudes recientes</h4>
+                                <p>Solicita tu primer crédito</p>
+                            </div>
+                        </div>
+                    </li>
+                `;
+            }
+        }
+
+        // Función para cargar las solicitudes del usuario
+        function loadUserRequests(userRequests) {
+            const userRequestsList = document.getElementById('userRequestsList');
+            userRequestsList.innerHTML = '';
+            
+            if (userRequests.length === 0) {
+                userRequestsList.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--gray);">
+                        <i class="fas fa-file-alt" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <p>No tienes solicitudes de crédito</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Ordenar solicitudes por fecha (más reciente primero)
+            userRequests.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            userRequests.forEach(request => {
+                const requestCard = document.createElement('div');
+                requestCard.className = 'card';
+                requestCard.style.marginBottom = '1rem';
+                
+                requestCard.innerHTML = `
+                    <div class="card-header">
+                        <h4>Solicitud #${request.id}</h4>
+                        <span class="status-badge status-${request.status}">
+                            ${getStatusText(request.status)}
+                        </span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <strong>Monto:</strong><br>
+                            <span style="color: var(--primary); font-weight: bold;">
+                                $${request.amount.toLocaleString()}
+                            </span>
+                        </div>
+                        <div>
+                            <strong>Plazo:</strong><br>
+                            <span>${request.term} meses</span>
+                        </div>
+                    </div>
+                    <div style="color: var(--gray); font-size: 0.9rem;">
+                        <i class="fas fa-calendar"></i> 
+                        ${new Date(request.timestamp).toLocaleDateString()} 
+                        ${new Date(request.timestamp).toLocaleTimeString()}
+                    </div>
+                    ${request.reviewedAt ? `
+                        <div style="color: var(--gray); font-size: 0.9rem; margin-top: 0.5rem;">
+                            <i class="fas fa-check-circle"></i> 
+                            Revisado: ${new Date(request.reviewedAt).toLocaleDateString()}
+                        </div>
+                    ` : ''}
+                `;
+                
+                userRequestsList.appendChild(requestCard);
+            });
+        }
+
+        // Función auxiliar para texto de estado
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'Pendiente',
+                'under_review': 'En Revisión',
+                'approved': 'Aprobado',
+                'rejected': 'Rechazado',
+                'completed': 'Completado'
+            };
+            return statusMap[status] || status;
+        }
+
+        // =============================================
+        // SISTEMA DE AUTENTICACIÓN (modificado)
+        // =============================================
+
         function showAuthPage() {
             showPage('authPage');
             mainNav.style.display = 'none';
@@ -1082,6 +1325,7 @@
             showPage('homePage');
             mainNav.style.display = 'flex';
             updateUserInfo();
+            loadUserCreditStatus(); // ¡IMPORTANTE! Cargar estado del crédito
         }
 
         function updateUserInfo() {
@@ -1178,7 +1422,10 @@
             }
         });
 
-        // Navegación entre páginas
+        // =============================================
+        // SISTEMA DE NAVEGACIÓN (modificado)
+        // =============================================
+
         function showPage(pageId) {
             pages.forEach(page => {
                 page.classList.remove('active');
@@ -1194,6 +1441,11 @@
                     item.classList.add('active');
                 }
             });
+
+            // Recargar datos si es la página de inicio
+            if (pageId === 'homePage' && currentUser) {
+                loadUserCreditStatus();
+            }
         }
 
         // Configurar event listeners para navegación
@@ -1222,6 +1474,41 @@
                 }
             });
         });
+
+        // =============================================
+        // BOTONES DE ACCIÓN (modificados)
+        // =============================================
+
+        quickLoanBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!currentUser) {
+                showAuthPage();
+                return;
+            }
+            
+            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+            const pendingRequest = requests.find(req => 
+                req.clientEmail === currentUser.email && req.status === 'pending'
+            );
+            
+            if (pendingRequest) {
+                // Si tiene solicitud pendiente, mostrar página de solicitudes
+                showPage('requestsPage');
+            } else {
+                // Si no tiene solicitud pendiente, ir a nueva solicitud
+                showPage('loanPage');
+            }
+        });
+
+        viewCreditDetailsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('requestsPage');
+        });
+
+        // =============================================
+        // EL RESTO DEL CÓDIGO PERMANECE IGUAL
+        // (calculadoras, subida de archivos, etc.)
+        // =============================================
 
         // Cálculo con Tasa Global (Interés Simple)
         function calculateLoan() {
@@ -1332,158 +1619,141 @@
             });
         });
 
-        // Botones de acción
-        quickLoanBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (!currentUser) {
-                showAuthPage();
-                return;
-            }
-            showPage('loanPage');
-        });
-
-        viewCreditBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('Aquí verías los detalles de tu crédito actual');
-        });
-
         showDocumentsBtn.addEventListener('click', (e) => {
             e.preventDefault();
             showPage('documentsPage');
         });
 
-// =============================================
-// FUNCIÓN MEJORADA: GUARDAR ARCHIVOS COMO BASE64
-// =============================================
-function saveCreditRequest(amount, term, files) {
-    const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
-    
-    // Función para convertir archivo a Base64
-    function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-            reader.readAsDataURL(file);
-        });
-    }
-
-    // Procesar todos los archivos
-    Promise.all([
-        fileToBase64(files.idFile),
-        fileToBase64(files.addressFile),
-        fileToBase64(files.creditFile),
-        fileToBase64(files.bankFile)
-    ]).then(([idBase64, addressBase64, creditBase64, bankBase64]) => {
-        const documents = {
-            identification: { 
-                type: files.idFile.type.includes('image') ? 'image' : 'pdf',
-                name: files.idFile.name,
-                data: idBase64,
-                size: files.idFile.size
-            },
-            address: { 
-                type: files.addressFile.type.includes('image') ? 'image' : 'pdf',
-                name: files.addressFile.name,
-                data: addressBase64,
-                size: files.addressFile.size
-            },
-            credit: { 
-                type: files.creditFile.type.includes('image') ? 'image' : 'pdf',
-                name: files.creditFile.name,
-                data: creditBase64,
-                size: files.creditFile.size
-            },
-            bank: { 
-                type: files.bankFile.type.includes('image') ? 'image' : 'pdf',
-                name: files.bankFile.name,
-                data: bankBase64,
-                size: files.bankFile.size
+        // FUNCIÓN MEJORADA: GUARDAR ARCHIVOS COMO BASE64
+        function saveCreditRequest(amount, term, files) {
+            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+            
+            // Función para convertir archivo a Base64
+            function fileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
             }
-        };
-        
-        const newRequest = {
-            id: Date.now(),
-            clientName: currentUser.name,
-            clientEmail: currentUser.email,
-            clientPhone: currentUser.phone,
-            amount: amount,
-            term: term,
-            status: 'pending',
-            timestamp: new Date().toISOString(),
-            documents: documents
-        };
-        
-        requests.push(newRequest);
-        localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
-        
-        console.log('Solicitud guardada con archivos Base64:', newRequest);
-        
-        // Mostrar confirmación
-        alert(`✅ ¡Solicitud #${newRequest.id} enviada al CRM!\n\nSe guardaron todos tus documentos correctamente.`);
-        
-        // Limpiar formulario
-        document.getElementById('idFile').value = '';
-        document.getElementById('addressFile').value = '';
-        document.getElementById('creditFile').value = '';
-        document.getElementById('bankFile').value = '';
-        
-        document.querySelectorAll('.file-name').forEach(el => {
-            el.textContent = 'No se ha seleccionado archivo';
-        });
-        
-        showPage('homePage');
-        
-    }).catch(error => {
-        console.error('Error al procesar archivos:', error);
-        alert('❌ Error al procesar los archivos. Por favor intenta nuevamente.');
-    });
-}
 
-// =============================================
-// BOTÓN MODIFICADO: PROCESAR ARCHIVOS
-// =============================================
-submitDocumentsBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    
-    // 1. VERIFICAR QUE ESTÉ LOGUEADO
-    if (!currentUser) {
-        alert('Debes iniciar sesión primero');
-        showPage('authPage');
-        return;
-    }
-    
-    // 2. VERIFICAR ARCHIVOS
-    const idFile = document.getElementById('idFile').files[0];
-    const addressFile = document.getElementById('addressFile').files[0];
-    const creditFile = document.getElementById('creditFile').files[0];
-    const bankFile = document.getElementById('bankFile').files[0];
-    
-    if (!idFile || !addressFile || !creditFile || !bankFile) {
-        alert('❌ Por favor sube TODOS los documentos requeridos.');
-        return;
-    }
-    
-    // 3. VERIFICAR TAMAÑO DE ARCHIVOS (máximo 5MB cada uno)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (idFile.size > maxSize || addressFile.size > maxSize || 
-        creditFile.size > maxSize || bankFile.size > maxSize) {
-        alert('❌ Cada archivo debe ser menor a 5MB. Por favor comprime tus archivos.');
-        return;
-    }
-    
-    // 4. OBTENER DATOS DEL PRÉSTAMO
-    const loanAmount = parseInt(document.getElementById('loanAmount').value);
-    const loanTerm = parseInt(document.getElementById('loanTerm').value);
-    
-    // 5. MOSTRAR MENSAJE DE PROCESAMIENTO
-    alert('⏳ Procesando tus documentos... Esto puede tomar unos segundos.');
-    
-    // 6. GUARDAR EN CRM CON ARCHIVOS BASE64
-    saveCreditRequest(loanAmount, loanTerm, {
-        idFile, addressFile, creditFile, bankFile
-    });
-});
+            // Procesar todos los archivos
+            Promise.all([
+                fileToBase64(files.idFile),
+                fileToBase64(files.addressFile),
+                fileToBase64(files.creditFile),
+                fileToBase64(files.bankFile)
+            ]).then(([idBase64, addressBase64, creditBase64, bankBase64]) => {
+                const documents = {
+                    identification: { 
+                        type: files.idFile.type.includes('image') ? 'image' : 'pdf',
+                        name: files.idFile.name,
+                        data: idBase64,
+                        size: files.idFile.size
+                    },
+                    address: { 
+                        type: files.addressFile.type.includes('image') ? 'image' : 'pdf',
+                        name: files.addressFile.name,
+                        data: addressBase64,
+                        size: files.addressFile.size
+                    },
+                    credit: { 
+                        type: files.creditFile.type.includes('image') ? 'image' : 'pdf',
+                        name: files.creditFile.name,
+                        data: creditBase64,
+                        size: files.creditFile.size
+                    },
+                    bank: { 
+                        type: files.bankFile.type.includes('image') ? 'image' : 'pdf',
+                        name: files.bankFile.name,
+                        data: bankBase64,
+                        size: files.bankFile.size
+                    }
+                };
+                
+                const newRequest = {
+                    id: Date.now(),
+                    clientName: currentUser.name,
+                    clientEmail: currentUser.email,
+                    clientPhone: currentUser.phone,
+                    amount: amount,
+                    term: term,
+                    status: 'pending',
+                    timestamp: new Date().toISOString(),
+                    documents: documents
+                };
+                
+                requests.push(newRequest);
+                localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
+                
+                console.log('Solicitud guardada con archivos Base64:', newRequest);
+                
+                // Mostrar confirmación
+                alert(`✅ ¡Solicitud #${newRequest.id} enviada al CRM!\n\nSe guardaron todos tus documentos correctamente.`);
+                
+                // Limpiar formulario
+                document.getElementById('idFile').value = '';
+                document.getElementById('addressFile').value = '';
+                document.getElementById('creditFile').value = '';
+                document.getElementById('bankFile').value = '';
+                
+                document.querySelectorAll('.file-name').forEach(el => {
+                    el.textContent = 'No se ha seleccionado archivo';
+                });
+                
+                // Recargar estado del crédito
+                loadUserCreditStatus();
+                showPage('homePage');
+                
+            }).catch(error => {
+                console.error('Error al procesar archivos:', error);
+                alert('❌ Error al procesar los archivos. Por favor intenta nuevamente.');
+            });
+        }
+
+        // BOTÓN MODIFICADO: PROCESAR ARCHIVOS
+        submitDocumentsBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // 1. VERIFICAR QUE ESTÉ LOGUEADO
+            if (!currentUser) {
+                alert('Debes iniciar sesión primero');
+                showPage('authPage');
+                return;
+            }
+            
+            // 2. VERIFICAR ARCHIVOS
+            const idFile = document.getElementById('idFile').files[0];
+            const addressFile = document.getElementById('addressFile').files[0];
+            const creditFile = document.getElementById('creditFile').files[0];
+            const bankFile = document.getElementById('bankFile').files[0];
+            
+            if (!idFile || !addressFile || !creditFile || !bankFile) {
+                alert('❌ Por favor sube TODOS los documentos requeridos.');
+                return;
+            }
+            
+            // 3. VERIFICAR TAMAÑO DE ARCHIVOS (máximo 5MB cada uno)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (idFile.size > maxSize || addressFile.size > maxSize || 
+                creditFile.size > maxSize || bankFile.size > maxSize) {
+                alert('❌ Cada archivo debe ser menor a 5MB. Por favor comprime tus archivos.');
+                return;
+            }
+            
+            // 4. OBTENER DATOS DEL PRÉSTAMO
+            const loanAmount = parseInt(document.getElementById('loanAmount').value);
+            const loanTerm = parseInt(document.getElementById('loanTerm').value);
+            
+            // 5. MOSTRAR MENSAJE DE PROCESAMIENTO
+            alert('⏳ Procesando tus documentos... Esto puede tomar unos segundos.');
+            
+            // 6. GUARDAR EN CRM CON ARCHIVOS BASE64
+            saveCreditRequest(loanAmount, loanTerm, {
+                idFile, addressFile, creditFile, bankFile
+            });
+        });
 
         applyFromCalcBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -1496,6 +1766,3 @@ submitDocumentsBtn.addEventListener('click', function(e) {
     </script>
 </body>
 </html>
-
-
-
