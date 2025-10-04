@@ -1353,60 +1353,95 @@
         });
 
 // =============================================
-// FUNCIÓN MEJORADA: GUARDAR SOLICITUD EN CRM CON ARCHIVOS REALES
+// FUNCIÓN MEJORADA: GUARDAR ARCHIVOS COMO BASE64
 // =============================================
 function saveCreditRequest(amount, term, files) {
     const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
     
-    // Crear URLs temporales para los archivos
-    const documents = {
-        identification: { 
-            type: files.idFile.type.includes('image') ? 'image' : 'pdf',
-            name: files.idFile.name,
-            url: URL.createObjectURL(files.idFile),
-            file: files.idFile
-        },
-        address: { 
-            type: files.addressFile.type.includes('image') ? 'image' : 'pdf',
-            name: files.addressFile.name,
-            url: URL.createObjectURL(files.addressFile),
-            file: files.addressFile
-        },
-        credit: { 
-            type: files.creditFile.type.includes('image') ? 'image' : 'pdf',
-            name: files.creditFile.name,
-            url: URL.createObjectURL(files.creditFile),
-            file: files.creditFile
-        },
-        bank: { 
-            type: files.bankFile.type.includes('image') ? 'image' : 'pdf',
-            name: files.bankFile.name,
-            url: URL.createObjectURL(files.bankFile),
-            file: files.bankFile
-        }
-    };
-    
-    const newRequest = {
-        id: Date.now(),
-        clientName: currentUser.name,
-        clientEmail: currentUser.email,
-        clientPhone: currentUser.phone,
-        amount: amount,
-        term: term,
-        status: 'pending',
-        timestamp: new Date().toISOString(),
-        documents: documents
-    };
-    
-    requests.push(newRequest);
-    localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
-    
-    console.log('Solicitud guardada en CRM con archivos reales:', newRequest);
-    return newRequest.id;
+    // Función para convertir archivo a Base64
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Procesar todos los archivos
+    Promise.all([
+        fileToBase64(files.idFile),
+        fileToBase64(files.addressFile),
+        fileToBase64(files.creditFile),
+        fileToBase64(files.bankFile)
+    ]).then(([idBase64, addressBase64, creditBase64, bankBase64]) => {
+        const documents = {
+            identification: { 
+                type: files.idFile.type.includes('image') ? 'image' : 'pdf',
+                name: files.idFile.name,
+                data: idBase64,
+                size: files.idFile.size
+            },
+            address: { 
+                type: files.addressFile.type.includes('image') ? 'image' : 'pdf',
+                name: files.addressFile.name,
+                data: addressBase64,
+                size: files.addressFile.size
+            },
+            credit: { 
+                type: files.creditFile.type.includes('image') ? 'image' : 'pdf',
+                name: files.creditFile.name,
+                data: creditBase64,
+                size: files.creditFile.size
+            },
+            bank: { 
+                type: files.bankFile.type.includes('image') ? 'image' : 'pdf',
+                name: files.bankFile.name,
+                data: bankBase64,
+                size: files.bankFile.size
+            }
+        };
+        
+        const newRequest = {
+            id: Date.now(),
+            clientName: currentUser.name,
+            clientEmail: currentUser.email,
+            clientPhone: currentUser.phone,
+            amount: amount,
+            term: term,
+            status: 'pending',
+            timestamp: new Date().toISOString(),
+            documents: documents
+        };
+        
+        requests.push(newRequest);
+        localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
+        
+        console.log('Solicitud guardada con archivos Base64:', newRequest);
+        
+        // Mostrar confirmación
+        alert(`✅ ¡Solicitud #${newRequest.id} enviada al CRM!\n\nSe guardaron todos tus documentos correctamente.`);
+        
+        // Limpiar formulario
+        document.getElementById('idFile').value = '';
+        document.getElementById('addressFile').value = '';
+        document.getElementById('creditFile').value = '';
+        document.getElementById('bankFile').value = '';
+        
+        document.querySelectorAll('.file-name').forEach(el => {
+            el.textContent = 'No se ha seleccionado archivo';
+        });
+        
+        showPage('homePage');
+        
+    }).catch(error => {
+        console.error('Error al procesar archivos:', error);
+        alert('❌ Error al procesar los archivos. Por favor intenta nuevamente.');
+    });
 }
 
 // =============================================
-// BOTÓN MEJORADO: GUARDAR ARCHIVOS REALES
+// BOTÓN MODIFICADO: PROCESAR ARCHIVOS
 // =============================================
 submitDocumentsBtn.addEventListener('click', function(e) {
     e.preventDefault();
@@ -1429,29 +1464,25 @@ submitDocumentsBtn.addEventListener('click', function(e) {
         return;
     }
     
-    // 3. OBTENER DATOS DEL PRÉSTAMO
+    // 3. VERIFICAR TAMAÑO DE ARCHIVOS (máximo 5MB cada uno)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (idFile.size > maxSize || addressFile.size > maxSize || 
+        creditFile.size > maxSize || bankFile.size > maxSize) {
+        alert('❌ Cada archivo debe ser menor a 5MB. Por favor comprime tus archivos.');
+        return;
+    }
+    
+    // 4. OBTENER DATOS DEL PRÉSTAMO
     const loanAmount = parseInt(document.getElementById('loanAmount').value);
     const loanTerm = parseInt(document.getElementById('loanTerm').value);
     
-    // 4. GUARDAR EN CRM CON ARCHIVOS REALES
-    const requestId = saveCreditRequest(loanAmount, loanTerm, {
+    // 5. MOSTRAR MENSAJE DE PROCESAMIENTO
+    alert('⏳ Procesando tus documentos... Esto puede tomar unos segundos.');
+    
+    // 6. GUARDAR EN CRM CON ARCHIVOS BASE64
+    saveCreditRequest(loanAmount, loanTerm, {
         idFile, addressFile, creditFile, bankFile
     });
-    
-    // 5. MOSTRAR CONFIRMACIÓN
-    alert(`✅ ¡Solicitud #${requestId} enviada al CRM!\n\nSe guardaron todos tus documentos correctamente.`);
-    
-    // 6. LIMPIAR FORMULARIO
-    document.getElementById('idFile').value = '';
-    document.getElementById('addressFile').value = '';
-    document.getElementById('creditFile').value = '';
-    document.getElementById('bankFile').value = '';
-    
-    document.querySelectorAll('.file-name').forEach(el => {
-        el.textContent = 'No se ha seleccionado archivo';
-    });
-    
-    showPage('homePage');
 });
 
         applyFromCalcBtn.addEventListener('click', (e) => {
@@ -1465,5 +1496,6 @@ submitDocumentsBtn.addEventListener('click', function(e) {
     </script>
 </body>
 </html>
+
 
 
