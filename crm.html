@@ -351,6 +351,12 @@
             justify-content: center;
         }
         
+        .file-size {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 0.3rem;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .filters {
@@ -611,7 +617,7 @@
             });
         }
 
-        // Función para cargar documentos en el modal MEJORADA
+        // Función para cargar documentos en el modal
         function loadDocumentsToModal(request) {
             const documentGrid = document.getElementById('documentGrid');
             documentGrid.innerHTML = '';
@@ -625,7 +631,7 @@
 
             documents.forEach(doc => {
                 const docData = request.documents[doc.type];
-                const hasDocument = docData && docData.url;
+                const hasDocument = docData && docData.data;
                 
                 const docCard = document.createElement('div');
                 docCard.className = `document-card ${hasDocument ? 'has-document' : 'no-document'}`;
@@ -633,6 +639,9 @@
                 if (hasDocument) {
                     docCard.onclick = () => viewDocument(docData, doc.label);
                 }
+                
+                // Formatear tamaño del archivo
+                const fileSize = hasDocument ? formatFileSize(docData.size) : 'N/A';
                 
                 docCard.innerHTML = `
                     <div class="document-icon">
@@ -648,6 +657,9 @@
                         <div style="font-size: 0.7rem; color: var(--gray); margin-top: 0.3rem;">
                             ${docData.name}
                         </div>
+                        <div class="file-size">
+                            ${fileSize}
+                        </div>
                     ` : ''}
                 `;
                 
@@ -655,7 +667,16 @@
             });
         }
 
-        // Ver detalles de una solicitud MEJORADA
+        // Formatear tamaño de archivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Ver detalles de una solicitud
         function viewRequest(requestId) {
             const request = creditRequests.find(req => req.id === requestId);
             if (!request) {
@@ -672,20 +693,24 @@
             document.getElementById('requestModal').style.display = 'flex';
         }
 
-        // Función para ver documentos CORREGIDA
+        // Función para ver documentos CON BASE64
         function viewDocument(documentData, documentName) {
             const viewer = document.getElementById('documentViewer');
             
-            if (documentData && documentData.url) {
-                if (documentData.type === 'image' || documentData.name.includes('.jpg') || documentData.name.includes('.png') || documentData.name.includes('.jpeg')) {
+            if (documentData && documentData.data) {
+                if (documentData.type === 'image' || 
+                    documentData.name.includes('.jpg') || 
+                    documentData.name.includes('.png') || 
+                    documentData.name.includes('.jpeg')) {
+                    
                     viewer.innerHTML = `
                         <h4>${documentName}</h4>
-                        <img src="${documentData.url}" alt="${documentName}" style="max-width: 100%; max-height: 400px; border-radius: 5px;">
+                        <img src="${documentData.data}" alt="${documentName}" style="max-width: 100%; max-height: 400px; border-radius: 5px;">
                         <div class="document-actions">
-                            <button class="action-btn btn-view" onclick="downloadDocument('${documentData.url}', '${documentData.name}')">
+                            <button class="action-btn btn-view" onclick="downloadBase64Document('${documentData.data}', '${documentData.name}')">
                                 <i class="fas fa-download"></i> Descargar Imagen
                             </button>
-                            <button class="action-btn btn-secondary" onclick="openDocument('${documentData.url}')">
+                            <button class="action-btn btn-secondary" onclick="openBase64Document('${documentData.data}')">
                                 <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
                             </button>
                         </div>
@@ -698,11 +723,12 @@
                             <i class="fas fa-file-pdf" style="font-size: 4rem; color: var(--accent);"></i>
                             <p style="margin-top: 1rem;">${documentData.name}</p>
                             <p style="color: var(--gray); font-size: 0.9rem;">Tipo: ${documentData.type}</p>
+                            <p style="color: var(--gray); font-size: 0.9rem;">Tamaño: ${formatFileSize(documentData.size)}</p>
                             <div class="document-actions">
-                                <button class="action-btn btn-view" onclick="downloadDocument('${documentData.url}', '${documentData.name}')">
+                                <button class="action-btn btn-view" onclick="downloadBase64Document('${documentData.data}', '${documentData.name}')">
                                     <i class="fas fa-download"></i> Descargar Documento
                                 </button>
-                                <button class="action-btn btn-secondary" onclick="openDocument('${documentData.url}')">
+                                <button class="action-btn btn-secondary" onclick="openBase64Document('${documentData.data}')">
                                     <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
                                 </button>
                             </div>
@@ -718,18 +744,18 @@
             }
         }
 
-        // Función de descarga MEJORADA
-        function downloadDocument(url, filename) {
+        // Descargar documento Base64
+        function downloadBase64Document(base64Data, filename) {
             try {
+                // Crear link de descarga
                 const link = document.createElement('a');
-                link.href = url;
+                link.href = base64Data;
                 link.download = filename;
                 link.style.display = 'none';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 
-                // Mostrar confirmación
                 setTimeout(() => {
                     alert(`✅ Documento "${filename}" descargado correctamente`);
                 }, 500);
@@ -740,9 +766,31 @@
             }
         }
 
-        // Nueva función para abrir documento
-        function openDocument(url) {
-            window.open(url, '_blank');
+        // Abrir documento Base64 en nueva pestaña
+        function openBase64Document(base64Data) {
+            try {
+                const newWindow = window.open();
+                newWindow.document.write(`
+                    <html>
+                        <head><title>Documento</title></head>
+                        <body style="margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+                            <img src="${base64Data}" style="max-width: 100%; max-height: 90vh;" onerror="this.style.display='none'; document.getElementById('pdfViewer').style.display='block';">
+                            <embed id="pdfViewer" src="${base64Data}" type="application/pdf" width="100%" height="600px" style="display:none;">
+                            <div style="position: fixed; top: 20px; right: 20px;">
+                                <button onclick="window.print()" style="padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                    🖨️ Imprimir
+                                </button>
+                                <button onclick="window.close()" style="padding: 10px 15px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
+                                    ❌ Cerrar
+                                </button>
+                            </div>
+                        </body>
+                    </html>
+                `);
+            } catch (error) {
+                console.error('Error al abrir documento:', error);
+                alert('❌ Error al abrir el documento. Intenta descargarlo.');
+            }
         }
 
         // Actualizar estado de solicitud
@@ -803,52 +851,8 @@
             return statusMap[status] || status;
         }
 
-        // Simular algunas solicitudes de ejemplo si no hay datos
-        function initializeSampleData() {
-            if (creditRequests.length === 0) {
-                const sampleRequests = [
-                    {
-                        id: 1001,
-                        clientName: 'Ana Rodríguez',
-                        clientEmail: 'ana.rodriguez@email.com',
-                        clientPhone: '55 1234 5678',
-                        amount: 3500,
-                        term: 6,
-                        status: 'pending',
-                        timestamp: new Date().toISOString(),
-                        documents: {
-                            identification: { 
-                                type: 'image', 
-                                name: 'ine_ana.jpg',
-                                url: 'https://via.placeholder.com/400x300/1a5276/ffffff?text=INE+Ana+R'
-                            },
-                            address: { 
-                                type: 'image', 
-                                name: 'comprobante_domicilio.jpg',
-                                url: 'https://via.placeholder.com/400x300/3498db/ffffff?text=Comprobante+Domicilio'
-                            },
-                            credit: { 
-                                type: 'pdf',
-                                name: 'buro_credito.pdf',
-                                url: 'https://via.placeholder.com/400x300/e74c3c/ffffff?text=Buró+de+Crédito'
-                            },
-                            bank: { 
-                                type: 'pdf',
-                                name: 'estado_cuenta.pdf',
-                                url: 'https://via.placeholder.com/400x300/27ae60/ffffff?text=Estado+de+Cuenta'
-                            }
-                        }
-                    }
-                ];
-
-                creditRequests = sampleRequests;
-                localStorage.setItem('creditxpress_requests', JSON.stringify(creditRequests));
-            }
-        }
-
         // Inicializar
         window.addEventListener('load', () => {
-            initializeSampleData();
             loadStatistics();
             loadRequests();
         });
