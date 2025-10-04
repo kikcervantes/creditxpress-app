@@ -617,7 +617,7 @@
             });
         }
 
-        // Función para cargar documentos en el modal
+        // Función CORREGIDA para cargar documentos en el modal
         function loadDocumentsToModal(request) {
             const documentGrid = document.getElementById('documentGrid');
             documentGrid.innerHTML = '';
@@ -631,7 +631,12 @@
 
             documents.forEach(doc => {
                 const docData = request.documents[doc.type];
-                const hasDocument = docData && docData.data;
+                
+                // VERIFICACIÓN MEJORADA - Asegurar que existe docData y tiene datos Base64
+                const hasDocument = docData && docData.data && 
+                                   (docData.data.startsWith('data:image/') || 
+                                    docData.data.startsWith('data:application/pdf') ||
+                                    docData.data.startsWith('data:application/'));
                 
                 const docCard = document.createElement('div');
                 docCard.className = `document-card ${hasDocument ? 'has-document' : 'no-document'}`;
@@ -693,15 +698,26 @@
             document.getElementById('requestModal').style.display = 'flex';
         }
 
-        // Función para ver documentos CON BASE64
+        // Función MEJORADA para ver documentos CON BASE64
         function viewDocument(documentData, documentName) {
             const viewer = document.getElementById('documentViewer');
             
             if (documentData && documentData.data) {
+                // Verificar que el Base64 sea válido
+                if (!documentData.data.startsWith('data:')) {
+                    viewer.innerHTML = `
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                        <h4>Error en formato de documento</h4>
+                        <p>El documento no está en formato Base64 válido</p>
+                    `;
+                    return;
+                }
+                
                 if (documentData.type === 'image' || 
                     documentData.name.includes('.jpg') || 
                     documentData.name.includes('.png') || 
-                    documentData.name.includes('.jpeg')) {
+                    documentData.name.includes('.jpeg') ||
+                    documentData.data.startsWith('data:image/')) {
                     
                     viewer.innerHTML = `
                         <h4>${documentName}</h4>
@@ -715,8 +731,10 @@
                             </button>
                         </div>
                     `;
-                } else {
-                    // Para PDFs y otros documentos
+                } else if (documentData.type === 'pdf' || 
+                           documentData.name.includes('.pdf') ||
+                           documentData.data.startsWith('data:application/pdf')) {
+                    // Para PDFs
                     viewer.innerHTML = `
                         <h4>${documentName}</h4>
                         <div style="padding: 2rem; text-align: center;">
@@ -726,10 +744,26 @@
                             <p style="color: var(--gray); font-size: 0.9rem;">Tamaño: ${formatFileSize(documentData.size)}</p>
                             <div class="document-actions">
                                 <button class="action-btn btn-view" onclick="downloadBase64Document('${documentData.data}', '${documentData.name}')">
-                                    <i class="fas fa-download"></i> Descargar Documento
+                                    <i class="fas fa-download"></i> Descargar PDF
                                 </button>
                                 <button class="action-btn btn-secondary" onclick="openBase64Document('${documentData.data}')">
-                                    <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
+                                    <i class="fas fa-external-link-alt"></i> Abrir PDF
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Para otros tipos de documentos
+                    viewer.innerHTML = `
+                        <h4>${documentName}</h4>
+                        <div style="padding: 2rem; text-align: center;">
+                            <i class="fas fa-file" style="font-size: 4rem; color: var(--secondary);"></i>
+                            <p style="margin-top: 1rem;">${documentData.name}</p>
+                            <p style="color: var(--gray); font-size: 0.9rem;">Tipo: ${documentData.type}</p>
+                            <p style="color: var(--gray); font-size: 0.9rem;">Tamaño: ${formatFileSize(documentData.size)}</p>
+                            <div class="document-actions">
+                                <button class="action-btn btn-view" onclick="downloadBase64Document('${documentData.data}', '${documentData.name}')">
+                                    <i class="fas fa-download"></i> Descargar
                                 </button>
                             </div>
                         </div>
@@ -851,10 +885,38 @@
             return statusMap[status] || status;
         }
 
+        // Función de diagnóstico para verificar los datos guardados
+        function debugRequests() {
+            console.log("=== DIAGNÓSTICO DE SOLICITUDES ===");
+            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+            
+            requests.forEach((request, index) => {
+                console.log(`Solicitud #${request.id}:`, {
+                    cliente: request.clientName,
+                    monto: request.amount,
+                    estado: request.status,
+                    documentos: request.documents ? Object.keys(request.documents) : 'Sin documentos'
+                });
+                
+                if (request.documents) {
+                    Object.entries(request.documents).forEach(([docType, docData]) => {
+                        console.log(`  ${docType}:`, {
+                            tieneDatos: !!(docData && docData.data),
+                            tipoBase64: docData && docData.data ? docData.data.substring(0, 50) + '...' : 'No hay datos',
+                            tamaño: docData ? docData.size : 'N/A'
+                        });
+                    });
+                }
+            });
+        }
+
         // Inicializar
         window.addEventListener('load', () => {
             loadStatistics();
             loadRequests();
+            
+            // Para diagnóstico, puedes descomentar la siguiente línea:
+            // debugRequests();
         });
 
         // Cerrar modal al hacer clic fuera
