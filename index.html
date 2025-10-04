@@ -1353,10 +1353,38 @@
         });
 
 // =============================================
-// NUEVA FUNCIÓN: GUARDAR SOLICITUD EN CRM
+// FUNCIÓN MEJORADA: GUARDAR SOLICITUD EN CRM CON ARCHIVOS REALES
 // =============================================
-function saveCreditRequest(amount, term, documents) {
+function saveCreditRequest(amount, term, files) {
     const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+    
+    // Crear URLs temporales para los archivos
+    const documents = {
+        identification: { 
+            type: files.idFile.type.includes('image') ? 'image' : 'pdf',
+            name: files.idFile.name,
+            url: URL.createObjectURL(files.idFile),
+            file: files.idFile
+        },
+        address: { 
+            type: files.addressFile.type.includes('image') ? 'image' : 'pdf',
+            name: files.addressFile.name,
+            url: URL.createObjectURL(files.addressFile),
+            file: files.addressFile
+        },
+        credit: { 
+            type: files.creditFile.type.includes('image') ? 'image' : 'pdf',
+            name: files.creditFile.name,
+            url: URL.createObjectURL(files.creditFile),
+            file: files.creditFile
+        },
+        bank: { 
+            type: files.bankFile.type.includes('image') ? 'image' : 'pdf',
+            name: files.bankFile.name,
+            url: URL.createObjectURL(files.bankFile),
+            file: files.bankFile
+        }
+    };
     
     const newRequest = {
         id: Date.now(),
@@ -1373,12 +1401,12 @@ function saveCreditRequest(amount, term, documents) {
     requests.push(newRequest);
     localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
     
-    console.log('Solicitud guardada en CRM:', newRequest);
+    console.log('Solicitud guardada en CRM con archivos reales:', newRequest);
     return newRequest.id;
 }
 
 // =============================================
-// BOTÓN MODIFICADO: ENVIAR AL CRM
+// BOTÓN MEJORADO: GUARDAR ARCHIVOS REALES
 // =============================================
 submitDocumentsBtn.addEventListener('click', function(e) {
     e.preventDefault();
@@ -1405,43 +1433,20 @@ submitDocumentsBtn.addEventListener('click', function(e) {
     const loanAmount = parseInt(document.getElementById('loanAmount').value);
     const loanTerm = parseInt(document.getElementById('loanTerm').value);
     
-    // 4. CREAR OBJETO DE DOCUMENTOS
-    const documents = {
-        identification: { 
-            type: idFile.type.includes('image') ? 'image' : 'pdf',
-            name: idFile.name,
-            url: 'https://via.placeholder.com/400x300?text=INE_' + currentUser.name.split(' ')[0]
-        },
-        address: { 
-            type: addressFile.type.includes('image') ? 'image' : 'pdf',
-            name: addressFile.name,
-            url: 'https://via.placeholder.com/400x300?text=DOMICILIO_' + currentUser.name.split(' ')[0]
-        },
-        credit: { 
-            type: 'pdf',
-            name: creditFile.name,
-            url: 'https://via.placeholder.com/400x300?text=BURÓ_CRÉDITO'
-        },
-        bank: { 
-            type: 'pdf',
-            name: bankFile.name,
-            url: 'https://via.placeholder.com/400x300?text=ESTADO_CUENTA'
-        }
-    };
+    // 4. GUARDAR EN CRM CON ARCHIVOS REALES
+    const requestId = saveCreditRequest(loanAmount, loanTerm, {
+        idFile, addressFile, creditFile, bankFile
+    });
     
-    // 5. GUARDAR EN CRM
-    const requestId = saveCreditRequest(loanAmount, loanTerm, documents);
+    // 5. MOSTRAR CONFIRMACIÓN
+    alert(`✅ ¡Solicitud #${requestId} enviada al CRM!\n\nSe guardaron todos tus documentos correctamente.`);
     
-    // 6. MOSTRAR CONFIRMACIÓN
-    alert(`✅ ¡Solicitud #${requestId} enviada al CRM!\n\nNuestro equipo la revisará y te contactaremos pronto.`);
-    
-    // 7. LIMPIAR FORMULARIO Y VOLVER AL INICIO
+    // 6. LIMPIAR FORMULARIO
     document.getElementById('idFile').value = '';
     document.getElementById('addressFile').value = '';
     document.getElementById('creditFile').value = '';
     document.getElementById('bankFile').value = '';
     
-    // Actualizar nombres de archivos
     document.querySelectorAll('.file-name').forEach(el => {
         el.textContent = 'No se ha seleccionado archivo';
     });
@@ -1460,4 +1465,5 @@ submitDocumentsBtn.addEventListener('click', function(e) {
     </script>
 </body>
 </html>
+
 
