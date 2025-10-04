@@ -296,13 +296,26 @@
             border-radius: 8px;
             padding: 1rem;
             text-align: center;
-            cursor: pointer;
             transition: all 0.3s ease;
         }
         
-        .document-card:hover {
+        .document-card.has-document {
+            border: 2px solid var(--success);
+            background-color: #f8fff8;
+            cursor: pointer;
+        }
+        
+        .document-card.has-document:hover {
             border-color: var(--secondary);
-            background: #f0f8ff;
+            background-color: #f0f8ff;
+            transform: translateY(-2px);
+        }
+        
+        .document-card.no-document {
+            border: 2px dashed var(--border);
+            background-color: var(--light);
+            cursor: not-allowed;
+            opacity: 0.6;
         }
         
         .document-icon {
@@ -315,9 +328,9 @@
             margin-top: 1rem;
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 1rem;
-            background: var(--light);
-            min-height: 200px;
+            padding: 2rem;
+            background: white;
+            min-height: 300px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -328,6 +341,14 @@
             max-width: 100%;
             max-height: 400px;
             border-radius: 5px;
+        }
+        
+        .document-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         
         /* Responsive */
@@ -347,6 +368,10 @@
             }
             
             .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .document-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -555,11 +580,14 @@
                     <td>#${request.id}</td>
                     <td>
                         <strong>${request.clientName}</strong><br>
-                        <small>${request.clientEmail}</small>
+                        <small>${request.clientEmail}</small><br>
+                        <small style="color: var(--gray);">${request.clientPhone}</small>
                     </td>
                     <td>$${request.amount.toLocaleString()}</td>
                     <td>${request.term} meses</td>
-                    <td>${new Date(request.timestamp).toLocaleDateString()}</td>
+                    <td>${new Date(request.timestamp).toLocaleDateString()}<br>
+                        <small style="color: var(--gray);">${new Date(request.timestamp).toLocaleTimeString()}</small>
+                    </td>
                     <td>
                         <span class="status-badge status-${request.status}">
                             ${getStatusText(request.status)}
@@ -583,15 +611,8 @@
             });
         }
 
-        // Ver detalles de una solicitud
-        function viewRequest(requestId) {
-            const request = creditRequests.find(req => req.id === requestId);
-            if (!request) return;
-
-            currentRequestId = requestId;
-            document.getElementById('modalRequestId').textContent = requestId;
-
-            // Cargar documentos
+        // Función para cargar documentos en el modal MEJORADA
+        function loadDocumentsToModal(request) {
             const documentGrid = document.getElementById('documentGrid');
             documentGrid.innerHTML = '';
 
@@ -603,62 +624,125 @@
             ];
 
             documents.forEach(doc => {
+                const docData = request.documents[doc.type];
+                const hasDocument = docData && docData.url;
+                
                 const docCard = document.createElement('div');
-                docCard.className = 'document-card';
-                docCard.onclick = () => viewDocument(request.documents[doc.type], doc.label);
+                docCard.className = `document-card ${hasDocument ? 'has-document' : 'no-document'}`;
+                
+                if (hasDocument) {
+                    docCard.onclick = () => viewDocument(docData, doc.label);
+                }
+                
                 docCard.innerHTML = `
                     <div class="document-icon">
                         <i class="fas ${doc.icon}"></i>
                     </div>
                     <div>${doc.label}</div>
-                    <div style="font-size: 0.8rem; color: ${request.documents[doc.type] ? 'var(--success)' : 'var(--accent)'}; margin-top: 0.5rem;">
-                        ${request.documents[doc.type] ? '✓ Subido' : '❌ Pendiente'}
+                    <div style="font-size: 0.8rem; margin-top: 0.5rem; 
+                        color: ${hasDocument ? 'var(--success)' : 'var(--accent)'}; 
+                        font-weight: ${hasDocument ? '600' : '400'}">
+                        ${hasDocument ? '✅ Documento listo' : '❌ Sin documento'}
                     </div>
+                    ${hasDocument ? `
+                        <div style="font-size: 0.7rem; color: var(--gray); margin-top: 0.3rem;">
+                            ${docData.name}
+                        </div>
+                    ` : ''}
                 `;
+                
                 documentGrid.appendChild(docCard);
             });
+        }
+
+        // Ver detalles de una solicitud MEJORADA
+        function viewRequest(requestId) {
+            const request = creditRequests.find(req => req.id === requestId);
+            if (!request) {
+                alert('Solicitud no encontrada');
+                return;
+            }
+
+            currentRequestId = requestId;
+            document.getElementById('modalRequestId').textContent = requestId;
+
+            // Cargar documentos en el modal
+            loadDocumentsToModal(request);
 
             document.getElementById('requestModal').style.display = 'flex';
         }
 
-        // Ver documento específico
+        // Función para ver documentos CORREGIDA
         function viewDocument(documentData, documentName) {
             const viewer = document.getElementById('documentViewer');
-            if (documentData) {
-                if (documentData.type === 'image') {
+            
+            if (documentData && documentData.url) {
+                if (documentData.type === 'image' || documentData.name.includes('.jpg') || documentData.name.includes('.png') || documentData.name.includes('.jpeg')) {
                     viewer.innerHTML = `
                         <h4>${documentName}</h4>
-                        <img src="${documentData.url}" alt="${documentName}">
-                        <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--gray);">
-                            Haz clic derecho → "Guardar imagen como..." para descargar
-                        </p>
+                        <img src="${documentData.url}" alt="${documentName}" style="max-width: 100%; max-height: 400px; border-radius: 5px;">
+                        <div class="document-actions">
+                            <button class="action-btn btn-view" onclick="downloadDocument('${documentData.url}', '${documentData.name}')">
+                                <i class="fas fa-download"></i> Descargar Imagen
+                            </button>
+                            <button class="action-btn btn-secondary" onclick="openDocument('${documentData.url}')">
+                                <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
+                            </button>
+                        </div>
                     `;
                 } else {
+                    // Para PDFs y otros documentos
                     viewer.innerHTML = `
                         <h4>${documentName}</h4>
                         <div style="padding: 2rem; text-align: center;">
                             <i class="fas fa-file-pdf" style="font-size: 4rem; color: var(--accent);"></i>
-                            <p style="margin-top: 1rem;">Documento PDF - ${documentData.name}</p>
-                            <button class="action-btn btn-view" onclick="downloadDocument('${documentData.url}', '${documentData.name}')" style="margin-top: 1rem;">
-                                <i class="fas fa-download"></i> Descargar PDF
-                            </button>
+                            <p style="margin-top: 1rem;">${documentData.name}</p>
+                            <p style="color: var(--gray); font-size: 0.9rem;">Tipo: ${documentData.type}</p>
+                            <div class="document-actions">
+                                <button class="action-btn btn-view" onclick="downloadDocument('${documentData.url}', '${documentData.name}')">
+                                    <i class="fas fa-download"></i> Descargar Documento
+                                </button>
+                                <button class="action-btn btn-secondary" onclick="openDocument('${documentData.url}')">
+                                    <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
+                                </button>
+                            </div>
                         </div>
                     `;
                 }
             } else {
                 viewer.innerHTML = `
                     <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
-                    <p>Documento no disponible</p>
+                    <h4>Documento no disponible</h4>
+                    <p>El documento no se pudo cargar correctamente</p>
                 `;
             }
         }
 
-        // Descargar documento
+        // Función de descarga MEJORADA
         function downloadDocument(url, filename) {
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            link.click();
+            try {
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Mostrar confirmación
+                setTimeout(() => {
+                    alert(`✅ Documento "${filename}" descargado correctamente`);
+                }, 500);
+                
+            } catch (error) {
+                console.error('Error al descargar:', error);
+                alert('❌ Error al descargar el documento. Intenta abrirlo en nueva pestaña.');
+            }
+        }
+
+        // Nueva función para abrir documento
+        function openDocument(url) {
+            window.open(url, '_blank');
         }
 
         // Actualizar estado de solicitud
@@ -699,6 +783,12 @@
         function closeModal() {
             document.getElementById('requestModal').style.display = 'none';
             currentRequestId = null;
+            
+            // Limpiar visor de documentos
+            document.getElementById('documentViewer').innerHTML = `
+                <i class="fas fa-file-alt" style="font-size: 3rem; color: var(--gray); margin-bottom: 1rem;"></i>
+                <p>Selecciona un documento para verlo</p>
+            `;
         }
 
         // Texto del estado
@@ -721,31 +811,32 @@
                         id: 1001,
                         clientName: 'Ana Rodríguez',
                         clientEmail: 'ana.rodriguez@email.com',
+                        clientPhone: '55 1234 5678',
                         amount: 3500,
                         term: 6,
                         status: 'pending',
                         timestamp: new Date().toISOString(),
                         documents: {
-                            identification: { type: 'image', url: 'https://via.placeholder.com/400x300?text=INE', name: 'ine_ana.jpg' },
-                            address: { type: 'image', url: 'https://via.placeholder.com/400x300?text=Comprobante', name: 'domicilio_ana.jpg' },
-                            credit: { type: 'pdf', url: '#', name: 'buro_credito_ana.pdf' },
-                            bank: { type: 'pdf', url: '#', name: 'estado_cuenta_ana.pdf' }
-                        }
-                    },
-                    {
-                        id: 1002,
-                        clientName: 'Carlos Mendoza',
-                        clientEmail: 'carlos.mendoza@email.com',
-                        amount: 2500,
-                        term: 4,
-                        status: 'approved',
-                        timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-                        reviewedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-                        documents: {
-                            identification: { type: 'image', url: 'https://via.placeholder.com/400x300?text=INE', name: 'ine_carlos.jpg' },
-                            address: { type: 'image', url: 'https://via.placeholder.com/400x300?text=Comprobante', name: 'domicilio_carlos.jpg' },
-                            credit: { type: 'pdf', url: '#', name: 'buro_credito_carlos.pdf' },
-                            bank: { type: 'pdf', url: '#', name: 'estado_cuenta_carlos.pdf' }
+                            identification: { 
+                                type: 'image', 
+                                name: 'ine_ana.jpg',
+                                url: 'https://via.placeholder.com/400x300/1a5276/ffffff?text=INE+Ana+R'
+                            },
+                            address: { 
+                                type: 'image', 
+                                name: 'comprobante_domicilio.jpg',
+                                url: 'https://via.placeholder.com/400x300/3498db/ffffff?text=Comprobante+Domicilio'
+                            },
+                            credit: { 
+                                type: 'pdf',
+                                name: 'buro_credito.pdf',
+                                url: 'https://via.placeholder.com/400x300/e74c3c/ffffff?text=Buró+de+Crédito'
+                            },
+                            bank: { 
+                                type: 'pdf',
+                                name: 'estado_cuenta.pdf',
+                                url: 'https://via.placeholder.com/400x300/27ae60/ffffff?text=Estado+de+Cuenta'
+                            }
                         }
                     }
                 ];
@@ -762,67 +853,12 @@
             loadRequests();
         });
 
-        // También necesitamos actualizar la aplicación del cliente para que guarde las solicitudes
-        // Agregar esto al final del script de la aplicación del cliente:
-        /*
-        // Función para guardar solicitud en el CRM
-        function saveCreditRequest(amount, term, documents) {
-            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
-            const newRequest = {
-                id: Date.now(),
-                clientName: currentUser.name,
-                clientEmail: currentUser.email,
-                amount: amount,
-                term: term,
-                status: 'pending',
-                timestamp: new Date().toISOString(),
-                documents: documents
-            };
-            
-            requests.push(newRequest);
-            localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
-            return newRequest.id;
-        }
-
-        // Modificar el submitDocumentsBtn para usar esta función
-        submitDocumentsBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // ... validaciones de archivos ...
-            
-            const documents = {
-                identification: { 
-                    type: 'image', 
-                    url: URL.createObjectURL(document.getElementById('idFile').files[0]),
-                    name: document.getElementById('idFile').files[0].name
-                },
-                address: { 
-                    type: 'image', 
-                    url: URL.createObjectURL(document.getElementById('addressFile').files[0]),
-                    name: document.getElementById('addressFile').files[0].name
-                },
-                credit: { 
-                    type: 'pdf', 
-                    url: URL.createObjectURL(document.getElementById('creditFile').files[0]),
-                    name: document.getElementById('creditFile').files[0].name
-                },
-                bank: { 
-                    type: 'pdf', 
-                    url: URL.createObjectURL(document.getElementById('bankFile').files[0]),
-                    name: document.getElementById('bankFile').files[0].name
-                }
-            };
-            
-            const requestId = saveCreditRequest(
-                parseInt(loanAmountSlider.value),
-                parseInt(loanTermSlider.value),
-                documents
-            );
-            
-            alert(`¡Solicitud #${requestId} enviada! Revisaremos tu información y te contactaremos pronto.`);
-            showPage('homePage');
+        // Cerrar modal al hacer clic fuera
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('requestModal')) {
+                closeModal();
+            }
         });
-        */
     </script>
 </body>
 </html>
