@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreditXpress CRM - Panel de Administración</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a5276;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
+            --gray: #7f8c8d;
+            --text: #333333;
+            --border: #e0e0e0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header CRM */
+        .crm-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            margin-left: 10px;
+            font-weight: 700;
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+        }
+        
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Dashboard */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stat-card.pending {
+            border-left-color: var(--warning);
+        }
+        
+        .stat-card.approved {
+            border-left-color: var(--success);
+        }
+        
+        .stat-card.rejected {
+            border-left-color: var(--accent);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* Filtros */
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .filter-label {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            background: white;
+        }
+        
+        /* Tabla de Solicitudes */
+        .requests-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background: var(--light);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: var(--light);
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-approved {
+            background: #d1edff;
+            color: var(--primary);
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 5px;
+        }
+        
+        .btn-view {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-approve {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-reject {
+            background: var(--accent);
+            color: white;
+        }
+        
+        /* Modal de Detalles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .document-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .document-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .document-card:hover {
+            border-color: var(--secondary);
+            background: #f0f8ff;
+        }
+        
+        .document-icon {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .document-viewer {
+            margin-top: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            background: var(--light);
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .document-viewer img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 5px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            th, td {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header CRM -->
+    <header class="crm-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">💼</span>
+                    <h1>CreditXpress CRM</h1>
+                </div>
+                <div class="admin-info">
+                    <div class="admin-avatar">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <div>Administrador</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Panel de Control</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Dashboard de Estadísticas -->
+        <div class="dashboard">
+            <div class="stat-card">
+                <div class="stat-number" id="totalRequests">0</div>
+                <div class="stat-label">Total Solicitudes</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="stat-number" id="pendingRequests">0</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+            <div class="stat-card approved">
+                <div class="stat-number" id="approvedRequests">0</div>
+                <div class="stat-label">Aprobadas</div>
+            </div>
+            <div class="stat-card rejected">
+                <div class="stat-number" id="rejectedRequests">0</div>
+                <div class="stat-label">Rechazadas</div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters">
+            <div class="filter-group">
+                <label class="filter-label">Estado</label>
+                <select class="filter-select" id="statusFilter">
+                    <option value="all">Todos los estados</option>
+                    <option value="pending">Pendiente</option>
+                    <option value="under_review">En revisión</option>
+                    <option value="approved">Aprobado</option>
+                    <option value="rejected">Rechazado</option>
+                    <option value="completed">Completado</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Fecha</label>
+                <select class="filter-select" id="dateFilter">
+                    <option value="all">Todas las fechas</option>
+                    <option value="today">Hoy</option>
+                    <option value="week">Esta semana</option>
+                    <option value="month">Este mes</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Monto</label>
+                <select class="filter-select" id="amountFilter">
+                    <option value="all">Todos los montos</option>
+                    <option value="1000-2000">$1,000 - $2,000</option>
+                    <option value="2001-3000">$2,001 - $3,000</option>
+                    <option value="3001-4000">$3,001 - $4,000</option>
+                    <option value="4001-5000">$4,001 - $5,000</option>
+                </select>
+            </div>
+            <button class="action-btn btn-view" onclick="loadRequests()">
+                <i class="fas fa-sync-alt"></i> Actualizar
+            </button>
+        </div>
+
+        <!-- Tabla de Solicitudes -->
+        <div class="requests-table">
+            <div class="table-header">
+                <h2>Solicitudes de Crédito</h2>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Monto</th>
+                            <th>Plazo</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestsTableBody">
+                        <!-- Las solicitudes se cargarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalles de Solicitud -->
+    <div class="modal" id="requestModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalles de Solicitud #<span id="modalRequestId"></span></h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="document-grid" id="documentGrid">
+                    <!-- Los documentos se cargarán aquí -->
+                </div>
+                <div class="document-viewer" id="documentViewer">
+                    <i class="fas fa-file-alt" style="font-size: 3rem; color: var(--gray); margin-bottom: 1rem;"></i>
+                    <p>Selecciona un documento para verlo</p>
+                </div>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button class="action-btn btn-reject" onclick="updateRequestStatus('rejected')">
+                        <i class="fas fa-times"></i> Rechazar
+                    </button>
+                    <button class="action-btn btn-approve" onclick="updateRequestStatus('approved')">
+                        <i class="fas fa-check"></i> Aprobar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos simulada para el CRM
+        let creditRequests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+        let currentRequestId = null;
+
+        // Cargar estadísticas
+        function loadStatistics() {
+            const total = creditRequests.length;
+            const pending = creditRequests.filter(req => req.status === 'pending').length;
+            const approved = creditRequests.filter(req => req.status === 'approved').length;
+            const rejected = creditRequests.filter(req => req.status === 'rejected').length;
+
+            document.getElementById('totalRequests').textContent = total;
+            document.getElementById('pendingRequests').textContent = pending;
+            document.getElementById('approvedRequests').textContent = approved;
+            document.getElementById('rejectedRequests').textContent = rejected;
+        }
+
+        // Cargar solicitudes en la tabla
+        function loadRequests() {
+            const tbody = document.getElementById('requestsTableBody');
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const amountFilter = document.getElementById('amountFilter').value;
+
+            let filteredRequests = creditRequests;
+
+            // Aplicar filtros
+            if (statusFilter !== 'all') {
+                filteredRequests = filteredRequests.filter(req => req.status === statusFilter);
+            }
+
+            if (dateFilter !== 'all') {
+                const now = new Date();
+                filteredRequests = filteredRequests.filter(req => {
+                    const requestDate = new Date(req.timestamp);
+                    switch (dateFilter) {
+                        case 'today':
+                            return requestDate.toDateString() === now.toDateString();
+                        case 'week':
+                            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                            return requestDate >= weekAgo;
+                        case 'month':
+                            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                            return requestDate >= monthAgo;
+                        default:
+                            return true;
+                    }
+                });
+            }
+
+            if (amountFilter !== 'all') {
+                const [min, max] = amountFilter.split('-').map(Number);
+                filteredRequests = filteredRequests.filter(req => {
+                    const amount = req.amount;
+                    return amount >= min && amount <= max;
+                });
+            }
+
+            // Ordenar por fecha (más reciente primero)
+            filteredRequests.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            tbody.innerHTML = '';
+
+            filteredRequests.forEach(request => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>#${request.id}</td>
+                    <td>
+                        <strong>${request.clientName}</strong><br>
+                        <small>${request.clientEmail}</small>
+                    </td>
+                    <td>$${request.amount.toLocaleString()}</td>
+                    <td>${request.term} meses</td>
+                    <td>${new Date(request.timestamp).toLocaleDateString()}</td>
+                    <td>
+                        <span class="status-badge status-${request.status}">
+                            ${getStatusText(request.status)}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="action-btn btn-view" onclick="viewRequest(${request.id})">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                        ${request.status === 'pending' ? `
+                            <button class="action-btn btn-approve" onclick="quickApprove(${request.id})">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="action-btn btn-reject" onclick="quickReject(${request.id})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        ` : ''}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Ver detalles de una solicitud
+        function viewRequest(requestId) {
+            const request = creditRequests.find(req => req.id === requestId);
+            if (!request) return;
+
+            currentRequestId = requestId;
+            document.getElementById('modalRequestId').textContent = requestId;
+
+            // Cargar documentos
+            const documentGrid = document.getElementById('documentGrid');
+            documentGrid.innerHTML = '';
+
+            const documents = [
+                { type: 'identification', label: 'Identificación', icon: 'fa-id-card' },
+                { type: 'address', label: 'Comprobante Domicilio', icon: 'fa-home' },
+                { type: 'credit', label: 'Buró de Crédito', icon: 'fa-chart-line' },
+                { type: 'bank', label: 'Estado Bancario', icon: 'fa-university' }
+            ];
+
+            documents.forEach(doc => {
+                const docCard = document.createElement('div');
+                docCard.className = 'document-card';
+                docCard.onclick = () => viewDocument(request.documents[doc.type], doc.label);
+                docCard.innerHTML = `
+                    <div class="document-icon">
+                        <i class="fas ${doc.icon}"></i>
+                    </div>
+                    <div>${doc.label}</div>
+                    <div style="font-size: 0.8rem; color: ${request.documents[doc.type] ? 'var(--success)' : 'var(--accent)'}; margin-top: 0.5rem;">
+                        ${request.documents[doc.type] ? '✓ Subido' : '❌ Pendiente'}
+                    </div>
+                `;
+                documentGrid.appendChild(docCard);
+            });
+
+            document.getElementById('requestModal').style.display = 'flex';
+        }
+
+        // Ver documento específico
+        function viewDocument(documentData, documentName) {
+            const viewer = document.getElementById('documentViewer');
+            if (documentData) {
+                if (documentData.type === 'image') {
+                    viewer.innerHTML = `
+                        <h4>${documentName}</h4>
+                        <img src="${documentData.url}" alt="${documentName}">
+                        <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--gray);">
+                            Haz clic derecho → "Guardar imagen como..." para descargar
+                        </p>
+                    `;
+                } else {
+                    viewer.innerHTML = `
+                        <h4>${documentName}</h4>
+                        <div style="padding: 2rem; text-align: center;">
+                            <i class="fas fa-file-pdf" style="font-size: 4rem; color: var(--accent);"></i>
+                            <p style="margin-top: 1rem;">Documento PDF - ${documentData.name}</p>
+                            <button class="action-btn btn-view" onclick="downloadDocument('${documentData.url}', '${documentData.name}')" style="margin-top: 1rem;">
+                                <i class="fas fa-download"></i> Descargar PDF
+                            </button>
+                        </div>
+                    `;
+                }
+            } else {
+                viewer.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                    <p>Documento no disponible</p>
+                `;
+            }
+        }
+
+        // Descargar documento
+        function downloadDocument(url, filename) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.click();
+        }
+
+        // Actualizar estado de solicitud
+        function updateRequestStatus(newStatus) {
+            if (!currentRequestId) return;
+
+            const requestIndex = creditRequests.findIndex(req => req.id === currentRequestId);
+            if (requestIndex !== -1) {
+                creditRequests[requestIndex].status = newStatus;
+                creditRequests[requestIndex].reviewedAt = new Date().toISOString();
+                localStorage.setItem('creditxpress_requests', JSON.stringify(creditRequests));
+                
+                loadStatistics();
+                loadRequests();
+                closeModal();
+                
+                alert(`Solicitud ${newStatus === 'approved' ? 'aprobada' : 'rechazada'} correctamente.`);
+            }
+        }
+
+        // Aprobación rápida
+        function quickApprove(requestId) {
+            if (confirm('¿Estás seguro de que quieres aprobar esta solicitud?')) {
+                currentRequestId = requestId;
+                updateRequestStatus('approved');
+            }
+        }
+
+        // Rechazo rápido
+        function quickReject(requestId) {
+            if (confirm('¿Estás seguro de que quieres rechazar esta solicitud?')) {
+                currentRequestId = requestId;
+                updateRequestStatus('rejected');
+            }
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById('requestModal').style.display = 'none';
+            currentRequestId = null;
+        }
+
+        // Texto del estado
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'Pendiente',
+                'under_review': 'En Revisión',
+                'approved': 'Aprobado',
+                'rejected': 'Rechazado',
+                'completed': 'Completado'
+            };
+            return statusMap[status] || status;
+        }
+
+        // Simular algunas solicitudes de ejemplo si no hay datos
+        function initializeSampleData() {
+            if (creditRequests.length === 0) {
+                const sampleRequests = [
+                    {
+                        id: 1001,
+                        clientName: 'Ana Rodríguez',
+                        clientEmail: 'ana.rodriguez@email.com',
+                        amount: 3500,
+                        term: 6,
+                        status: 'pending',
+                        timestamp: new Date().toISOString(),
+                        documents: {
+                            identification: { type: 'image', url: 'https://via.placeholder.com/400x300?text=INE', name: 'ine_ana.jpg' },
+                            address: { type: 'image', url: 'https://via.placeholder.com/400x300?text=Comprobante', name: 'domicilio_ana.jpg' },
+                            credit: { type: 'pdf', url: '#', name: 'buro_credito_ana.pdf' },
+                            bank: { type: 'pdf', url: '#', name: 'estado_cuenta_ana.pdf' }
+                        }
+                    },
+                    {
+                        id: 1002,
+                        clientName: 'Carlos Mendoza',
+                        clientEmail: 'carlos.mendoza@email.com',
+                        amount: 2500,
+                        term: 4,
+                        status: 'approved',
+                        timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+                        reviewedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+                        documents: {
+                            identification: { type: 'image', url: 'https://via.placeholder.com/400x300?text=INE', name: 'ine_carlos.jpg' },
+                            address: { type: 'image', url: 'https://via.placeholder.com/400x300?text=Comprobante', name: 'domicilio_carlos.jpg' },
+                            credit: { type: 'pdf', url: '#', name: 'buro_credito_carlos.pdf' },
+                            bank: { type: 'pdf', url: '#', name: 'estado_cuenta_carlos.pdf' }
+                        }
+                    }
+                ];
+
+                creditRequests = sampleRequests;
+                localStorage.setItem('creditxpress_requests', JSON.stringify(creditRequests));
+            }
+        }
+
+        // Inicializar
+        window.addEventListener('load', () => {
+            initializeSampleData();
+            loadStatistics();
+            loadRequests();
+        });
+
+        // También necesitamos actualizar la aplicación del cliente para que guarde las solicitudes
+        // Agregar esto al final del script de la aplicación del cliente:
+        /*
+        // Función para guardar solicitud en el CRM
+        function saveCreditRequest(amount, term, documents) {
+            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+            const newRequest = {
+                id: Date.now(),
+                clientName: currentUser.name,
+                clientEmail: currentUser.email,
+                amount: amount,
+                term: term,
+                status: 'pending',
+                timestamp: new Date().toISOString(),
+                documents: documents
+            };
+            
+            requests.push(newRequest);
+            localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
+            return newRequest.id;
+        }
+
+        // Modificar el submitDocumentsBtn para usar esta función
+        submitDocumentsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // ... validaciones de archivos ...
+            
+            const documents = {
+                identification: { 
+                    type: 'image', 
+                    url: URL.createObjectURL(document.getElementById('idFile').files[0]),
+                    name: document.getElementById('idFile').files[0].name
+                },
+                address: { 
+                    type: 'image', 
+                    url: URL.createObjectURL(document.getElementById('addressFile').files[0]),
+                    name: document.getElementById('addressFile').files[0].name
+                },
+                credit: { 
+                    type: 'pdf', 
+                    url: URL.createObjectURL(document.getElementById('creditFile').files[0]),
+                    name: document.getElementById('creditFile').files[0].name
+                },
+                bank: { 
+                    type: 'pdf', 
+                    url: URL.createObjectURL(document.getElementById('bankFile').files[0]),
+                    name: document.getElementById('bankFile').files[0].name
+                }
+            };
+            
+            const requestId = saveCreditRequest(
+                parseInt(loanAmountSlider.value),
+                parseInt(loanTermSlider.value),
+                documents
+            );
+            
+            alert(`¡Solicitud #${requestId} enviada! Revisaremos tu información y te contactaremos pronto.`);
+            showPage('homePage');
+        });
+        */
+    </script>
+</body>
+</html>
