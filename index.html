@@ -1624,136 +1624,364 @@
             showPage('documentsPage');
         });
 
-        // FUNCIÓN MEJORADA: GUARDAR ARCHIVOS COMO BASE64
-        function saveCreditRequest(amount, term, files) {
-            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
-            
-            // Función para convertir archivo a Base64
-            function fileToBase64(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = error => reject(error);
-                    reader.readAsDataURL(file);
-                });
+// =============================================
+// FUNCIÓN MEJORADA: GUARDAR ARCHIVOS COMO BASE64 CON MANEJO DE ERRORES
+// =============================================
+function saveCreditRequest(amount, term, files) {
+    const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+    
+    // Función mejorada para convertir archivo a Base64
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            // Validar que el archivo existe
+            if (!file) {
+                reject(new Error('Archivo no válido'));
+                return;
             }
 
-            // Procesar todos los archivos
-            Promise.all([
-                fileToBase64(files.idFile),
-                fileToBase64(files.addressFile),
-                fileToBase64(files.creditFile),
-                fileToBase64(files.bankFile)
-            ]).then(([idBase64, addressBase64, creditBase64, bankBase64]) => {
-                const documents = {
-                    identification: { 
-                        type: files.idFile.type.includes('image') ? 'image' : 'pdf',
-                        name: files.idFile.name,
-                        data: idBase64,
-                        size: files.idFile.size
-                    },
-                    address: { 
-                        type: files.addressFile.type.includes('image') ? 'image' : 'pdf',
-                        name: files.addressFile.name,
-                        data: addressBase64,
-                        size: files.addressFile.size
-                    },
-                    credit: { 
-                        type: files.creditFile.type.includes('image') ? 'image' : 'pdf',
-                        name: files.creditFile.name,
-                        data: creditBase64,
-                        size: files.creditFile.size
-                    },
-                    bank: { 
-                        type: files.bankFile.type.includes('image') ? 'image' : 'pdf',
-                        name: files.bankFile.name,
-                        data: bankBase64,
-                        size: files.bankFile.size
-                    }
-                };
-                
-                const newRequest = {
-                    id: Date.now(),
-                    clientName: currentUser.name,
-                    clientEmail: currentUser.email,
-                    clientPhone: currentUser.phone,
-                    amount: amount,
-                    term: term,
-                    status: 'pending',
-                    timestamp: new Date().toISOString(),
-                    documents: documents
-                };
-                
-                requests.push(newRequest);
-                localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
-                
-                console.log('Solicitud guardada con archivos Base64:', newRequest);
-                
-                // Mostrar confirmación
-                alert(`✅ ¡Solicitud #${newRequest.id} enviada al CRM!\n\nSe guardaron todos tus documentos correctamente.`);
-                
-                // Limpiar formulario
-                document.getElementById('idFile').value = '';
-                document.getElementById('addressFile').value = '';
-                document.getElementById('creditFile').value = '';
-                document.getElementById('bankFile').value = '';
-                
-                document.querySelectorAll('.file-name').forEach(el => {
-                    el.textContent = 'No se ha seleccionado archivo';
-                });
-                
-                // Recargar estado del crédito
-                loadUserCreditStatus();
-                showPage('homePage');
-                
-            }).catch(error => {
-                console.error('Error al procesar archivos:', error);
-                alert('❌ Error al procesar los archivos. Por favor intenta nuevamente.');
-            });
-        }
+            // Validar tamaño máximo (10MB)
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (file.size > maxSize) {
+                reject(new Error(`El archivo ${file.name} es demasiado grande. Máximo 10MB.`));
+                return;
+            }
 
-        // BOTÓN MODIFICADO: PROCESAR ARCHIVOS
-        submitDocumentsBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+            // Validar tipos de archivo permitidos
+            const allowedTypes = [
+                'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
+                'application/pdf', 'image/webp'
+            ];
             
-            // 1. VERIFICAR QUE ESTÉ LOGUEADO
-            if (!currentUser) {
-                alert('Debes iniciar sesión primero');
-                showPage('authPage');
+            if (!allowedTypes.includes(file.type) && 
+                !file.name.match(/\.(jpg|jpeg|png|gif|pdf|webp)$/i)) {
+                reject(new Error(`Tipo de archivo no permitido: ${file.name}. Solo JPG, PNG, GIF, PDF.`));
                 return;
             }
+
+            const reader = new FileReader();
             
-            // 2. VERIFICAR ARCHIVOS
-            const idFile = document.getElementById('idFile').files[0];
-            const addressFile = document.getElementById('addressFile').files[0];
-            const creditFile = document.getElementById('creditFile').files[0];
-            const bankFile = document.getElementById('bankFile').files[0];
+            reader.onload = () => {
+                // Verificar que la lectura fue exitosa
+                if (reader.result && reader.result.toString().startsWith('data:')) {
+                    resolve(reader.result);
+                } else {
+                    reject(new Error('Error al convertir el archivo a Base64'));
+                }
+            };
             
-            if (!idFile || !addressFile || !creditFile || !bankFile) {
-                alert('❌ Por favor sube TODOS los documentos requeridos.');
-                return;
+            reader.onerror = (error) => {
+                console.error('Error en FileReader:', error);
+                reject(new Error(`Error al leer el archivo: ${file.name}`));
+            };
+            
+            reader.onabort = () => {
+                reject(new Error('Lectura del archivo cancelada'));
+            };
+            
+            try {
+                reader.readAsDataURL(file);
+            } catch (error) {
+                reject(new Error(`Error al procesar el archivo: ${file.name}`));
             }
-            
-            // 3. VERIFICAR TAMAÑO DE ARCHIVOS (máximo 5MB cada uno)
-            const maxSize = 5 * 1024 * 1024; // 5MB
-            if (idFile.size > maxSize || addressFile.size > maxSize || 
-                creditFile.size > maxSize || bankFile.size > maxSize) {
-                alert('❌ Cada archivo debe ser menor a 5MB. Por favor comprime tus archivos.');
-                return;
-            }
-            
-            // 4. OBTENER DATOS DEL PRÉSTAMO
-            const loanAmount = parseInt(document.getElementById('loanAmount').value);
-            const loanTerm = parseInt(document.getElementById('loanTerm').value);
-            
-            // 5. MOSTRAR MENSAJE DE PROCESAMIENTO
-            alert('⏳ Procesando tus documentos... Esto puede tomar unos segundos.');
-            
-            // 6. GUARDAR EN CRM CON ARCHIVOS BASE64
-            saveCreditRequest(loanAmount, loanTerm, {
-                idFile, addressFile, creditFile, bankFile
-            });
         });
+    }
+
+    // Mostrar progreso
+    alert('📤 Procesando documentos... Por favor espera.');
+
+    // Procesar todos los archivos con manejo individual de errores
+    const processFiles = async () => {
+        try {
+            const processedFiles = {};
+            const fileTypes = ['idFile', 'addressFile', 'creditFile', 'bankFile'];
+            
+            for (const fileType of fileTypes) {
+                const file = files[fileType];
+                if (file) {
+                    try {
+                        processedFiles[fileType] = await fileToBase64(file);
+                        console.log(`✅ ${fileType} procesado correctamente`);
+                    } catch (error) {
+                        console.error(`❌ Error en ${fileType}:`, error);
+                        throw new Error(`Error en ${getDocumentName(fileType)}: ${error.message}`);
+                    }
+                }
+            }
+
+            // Crear objeto de documentos
+            const documents = {
+                identification: { 
+                    type: getFileType(files.idFile),
+                    name: files.idFile.name,
+                    data: processedFiles.idFile,
+                    size: files.idFile.size,
+                    uploadedAt: new Date().toISOString()
+                },
+                address: { 
+                    type: getFileType(files.addressFile),
+                    name: files.addressFile.name,
+                    data: processedFiles.addressFile,
+                    size: files.addressFile.size,
+                    uploadedAt: new Date().toISOString()
+                },
+                credit: { 
+                    type: getFileType(files.creditFile),
+                    name: files.creditFile.name,
+                    data: processedFiles.creditFile,
+                    size: files.creditFile.size,
+                    uploadedAt: new Date().toISOString()
+                },
+                bank: { 
+                    type: getFileType(files.bankFile),
+                    name: files.bankFile.name,
+                    data: processedFiles.bankFile,
+                    size: files.bankFile.size,
+                    uploadedAt: new Date().toISOString()
+                }
+            };
+            
+            // Crear nueva solicitud
+            const newRequest = {
+                id: Date.now(),
+                clientName: currentUser.name,
+                clientEmail: currentUser.email,
+                clientPhone: currentUser.phone,
+                amount: amount,
+                term: term,
+                status: 'pending',
+                timestamp: new Date().toISOString(),
+                documents: documents,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            // Guardar en localStorage
+            requests.push(newRequest);
+            localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
+            
+            console.log('✅ Solicitud guardada exitosamente:', newRequest);
+            
+            // Mostrar confirmación detallada
+            showSuccessMessage(newRequest.id, documents);
+            
+            // Limpiar formulario
+            resetFileUploads();
+            
+            // Recargar estado del crédito
+            loadUserCreditStatus();
+            showPage('homePage');
+            
+        } catch (error) {
+            console.error('❌ Error general al procesar archivos:', error);
+            alert(`❌ Error al procesar documentos:\n\n${error.message}\n\nPor favor intenta nuevamente con archivos más pequeños o en formato diferente.`);
+        }
+    };
+
+    // Ejecutar procesamiento
+    processFiles();
+}
+
+// Función auxiliar para determinar tipo de archivo
+function getFileType(file) {
+    if (!file) return 'unknown';
+    
+    if (file.type.includes('image')) {
+        return 'image';
+    } else if (file.type.includes('pdf')) {
+        return 'pdf';
+    } else if (file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+        return 'image';
+    } else if (file.name.match(/\.pdf$/i)) {
+        return 'pdf';
+    } else {
+        return 'document';
+    }
+}
+
+// Función auxiliar para nombres de documentos
+function getDocumentName(fileType) {
+    const names = {
+        'idFile': 'Identificación',
+        'addressFile': 'Comprobante de domicilio',
+        'creditFile': 'Buró de crédito',
+        'bankFile': 'Estado de cuenta'
+    };
+    return names[fileType] || fileType;
+}
+
+// Función para mostrar mensaje de éxito detallado
+function showSuccessMessage(requestId, documents) {
+    let message = `✅ ¡Solicitud #${requestId} enviada exitosamente!\n\n`;
+    message += `📋 Documentos procesados:\n`;
+    
+    Object.entries(documents).forEach(([docType, docData]) => {
+        const docName = getDocumentName(docType + 'File');
+        const fileSize = formatFileSize(docData.size);
+        message += `• ${docName}: ${docData.name} (${fileSize})\n`;
+    });
+    
+    message += `\n📊 Resumen del crédito:\n`;
+    message += `• Monto: $${parseInt(document.getElementById('loanAmount').value).toLocaleString()}\n`;
+    message += `• Plazo: ${document.getElementById('loanTerm').value} meses\n`;
+    message += `• Cuota mensual: ${document.getElementById('monthlyPayment').textContent}\n\n`;
+    message += `⏳ Tu solicitud será revisada pronto.`;
+    
+    alert(message);
+}
+
+// Función para formatear tamaño de archivo
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Función para limpiar los uploads de archivos
+function resetFileUploads() {
+    // Limpiar inputs de archivo
+    document.getElementById('idFile').value = '';
+    document.getElementById('addressFile').value = '';
+    document.getElementById('creditFile').value = '';
+    document.getElementById('bankFile').value = '';
+    
+    // Limpiar nombres de archivo mostrados
+    document.querySelectorAll('.file-name').forEach(el => {
+        el.textContent = 'No se ha seleccionado archivo';
+    });
+    
+    // Remover clases de éxito
+    document.querySelectorAll('.file-upload').forEach(upload => {
+        upload.classList.remove('upload-success');
+    });
+}
+
+// =============================================
+// SISTEMA MEJORADO DE SUBIDA DE ARCHIVOS
+// =============================================
+const fileUploads = [
+    { id: 'idUpload', fileInput: 'idFile', fileName: 'idFileName' },
+    { id: 'addressUpload', fileInput: 'addressFile', fileName: 'addressFileName' },
+    { id: 'creditUpload', fileInput: 'creditFile', fileName: 'creditFileName' },
+    { id: 'bankUpload', fileInput: 'bankFile', fileName: 'bankFileName' }
+];
+
+fileUploads.forEach(upload => {
+    const uploadElement = document.getElementById(upload.id);
+    const fileInput = document.getElementById(upload.fileInput);
+    const fileName = document.getElementById(upload.fileName);
+    
+    uploadElement.addEventListener('click', () => {
+        fileInput.click();
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            
+            // Validaciones básicas del archivo
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            const allowedTypes = [
+                'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
+                'application/pdf', 'image/webp'
+            ];
+            
+            if (file.size > maxSize) {
+                alert(`❌ El archivo "${file.name}" es demasiado grande. Máximo 10MB.`);
+                fileInput.value = '';
+                fileName.textContent = 'No se ha seleccionado archivo';
+                return;
+            }
+            
+            if (!allowedTypes.includes(file.type) && 
+                !file.name.match(/\.(jpg|jpeg|png|gif|pdf|webp)$/i)) {
+                alert(`❌ Tipo de archivo no permitido: "${file.name}".\nSolo se permiten: JPG, PNG, GIF, PDF, WEBP.`);
+                fileInput.value = '';
+                fileName.textContent = 'No se ha seleccionado archivo';
+                return;
+            }
+            
+            // Mostrar información del archivo
+            const fileSize = formatFileSize(file.size);
+            fileName.textContent = `${file.name} (${fileSize})`;
+            
+            // Agregar indicador visual de éxito
+            uploadElement.classList.add('upload-success');
+            uploadElement.style.borderColor = 'var(--success)';
+            uploadElement.style.backgroundColor = '#f8fff8';
+        }
+    });
+    
+    // Efecto visual al arrastrar
+    uploadElement.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadElement.style.borderColor = 'var(--secondary)';
+        uploadElement.style.backgroundColor = '#f0f8ff';
+    });
+    
+    uploadElement.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        if (!uploadElement.classList.contains('upload-success')) {
+            uploadElement.style.borderColor = 'var(--border)';
+            uploadElement.style.backgroundColor = '';
+        }
+    });
+    
+    uploadElement.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            const event = new Event('change', { bubbles: true });
+            fileInput.dispatchEvent(event);
+        }
+    });
+});
+
+// =============================================
+// BOTÓN MEJORADO: PROCESAR ARCHIVOS
+// =============================================
+submitDocumentsBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // 1. VERIFICAR QUE ESTÉ LOGUEADO
+    if (!currentUser) {
+        alert('Debes iniciar sesión primero');
+        showPage('authPage');
+        return;
+    }
+    
+    // 2. VERIFICAR ARCHIVOS
+    const idFile = document.getElementById('idFile').files[0];
+    const addressFile = document.getElementById('addressFile').files[0];
+    const creditFile = document.getElementById('creditFile').files[0];
+    const bankFile = document.getElementById('bankFile').files[0];
+    
+    if (!idFile || !addressFile || !creditFile || !bankFile) {
+        alert('❌ Por favor sube TODOS los documentos requeridos.');
+        
+        // Resaltar los que faltan
+        fileUploads.forEach(upload => {
+            const fileInput = document.getElementById(upload.fileInput);
+            const uploadElement = document.getElementById(upload.id);
+            
+            if (!fileInput.files[0]) {
+                uploadElement.style.borderColor = 'var(--accent)';
+                uploadElement.style.backgroundColor = '#fff5f5';
+            }
+        });
+        
+        return;
+    }
+    
+    // 3. OBTENER DATOS DEL PRÉSTAMO
+    const loanAmount = parseInt(document.getElementById('loanAmount').value);
+    const loanTerm = parseInt(document.getElementById('loanTerm').value);
+    
+    // 4. GUARDAR EN CRM CON ARCHIVOS BASE64 (manejo mejorado)
+    saveCreditRequest(loanAmount, loanTerm, {
+        idFile, addressFile, creditFile, bankFile
+    });
+});
 
         applyFromCalcBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -1766,3 +1994,4 @@
     </script>
 </body>
 </html>
+
