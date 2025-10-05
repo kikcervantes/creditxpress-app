@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CreditXpress App</title>
+    <meta name="theme-color" content="#1a5276">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CreditXpress">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💳</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -25,6 +30,17 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        input, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
         
         body {
@@ -37,6 +53,12 @@
             margin: 0 auto;
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+        }
+        
+        html {
+            height: -webkit-fill-available;
         }
         
         #app {
@@ -114,6 +136,7 @@
             color: var(--gray);
             font-size: 0.8rem;
             flex: 1;
+            padding: 10px 5px;
         }
         
         .nav-item.active {
@@ -131,6 +154,7 @@
             overflow-y: auto;
             padding: 1rem;
             padding-bottom: 70px;
+            -webkit-overflow-scrolling: touch;
         }
         
         /* Tarjetas */
@@ -195,6 +219,15 @@
             cursor: pointer;
             text-align: center;
             font-size: 1rem;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        @media (max-width: 768px) {
+            .btn {
+                padding: 15px 20px;
+                font-size: 1.1rem;
+            }
         }
         
         .btn-primary {
@@ -298,6 +331,14 @@
             text-decoration: none;
             color: var(--text);
             transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        @media (max-width: 768px) {
+            .action-card {
+                padding: 1.2rem;
+            }
         }
         
         .action-card:hover {
@@ -393,6 +434,12 @@
             background-color: var(--light);
         }
         
+        @media (max-width: 768px) {
+            .form-control {
+                font-size: 16px; /* Previene zoom en iOS */
+            }
+        }
+        
         .range-container {
             display: flex;
             align-items: center;
@@ -415,6 +462,22 @@
             margin-bottom: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        @media (max-width: 768px) {
+            .file-upload {
+                padding: 1.5rem;
+                min-height: 120px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            
+            .file-upload i {
+                font-size: 1.5rem;
+            }
         }
         
         .file-upload:hover {
@@ -537,6 +600,8 @@
             border-bottom: 1px solid var(--border);
             text-decoration: none;
             color: var(--text);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         
         .menu-item:last-child {
@@ -627,6 +692,8 @@
             padding: 1rem;
             cursor: pointer;
             border-bottom: 3px solid transparent;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         
         .auth-tab.active {
@@ -909,7 +976,7 @@
                         <div class="file-upload" id="idUpload">
                             <i class="fas fa-id-card"></i>
                             <p>Haz clic para subir tu identificación</p>
-                            <input type="file" id="idFile" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp">
+                            <input type="file" id="idFile" accept="image/*, application/pdf" capture="environment">
                             <div class="file-name" id="idFileName">No se ha seleccionado archivo</div>
                             <div class="error-message" id="idFileError"></div>
                         </div>
@@ -920,7 +987,7 @@
                         <div class="file-upload" id="addressUpload">
                             <i class="fas fa-home"></i>
                             <p>Haz clic para subir comprobante de domicilio</p>
-                            <input type="file" id="addressFile" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp">
+                            <input type="file" id="addressFile" accept="image/*, application/pdf" capture="environment">
                             <div class="file-name" id="addressFileName">No se ha seleccionado archivo</div>
                             <div class="error-message" id="addressFileError"></div>
                         </div>
@@ -931,7 +998,7 @@
                         <div class="file-upload" id="creditUpload">
                             <i class="fas fa-chart-line"></i>
                             <p>Haz clic para subir reporte de buró de crédito</p>
-                            <input type="file" id="creditFile" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp">
+                            <input type="file" id="creditFile" accept="image/*, application/pdf" capture="environment">
                             <div class="file-name" id="creditFileName">No se ha seleccionado archivo</div>
                             <div class="error-message" id="creditFileError"></div>
                         </div>
@@ -942,7 +1009,7 @@
                         <div class="file-upload" id="bankUpload">
                             <i class="fas fa-university"></i>
                             <p>Haz clic para subir estado de cuenta</p>
-                            <input type="file" id="bankFile" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp">
+                            <input type="file" id="bankFile" accept="image/*, application/pdf" capture="environment">
                             <div class="file-name" id="bankFileName">No se ha seleccionado archivo</div>
                             <div class="error-message" id="bankFileError"></div>
                         </div>
@@ -1128,9 +1195,64 @@
     </div>
 
     <script>
+        // =============================================
+        // FUNCIONES DE COMPATIBILIDAD PARA MÓVILES
+        // =============================================
+
+        // Detectar si es móvil
+        function isMobileDevice() {
+            return (typeof window.orientation !== "undefined") || 
+                   (navigator.userAgent.indexOf('IEMobile') !== -1) ||
+                   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Función segura para localStorage
+        function safeLocalStorageGet(key) {
+            try {
+                return localStorage.getItem(key);
+            } catch (error) {
+                console.error('Error accediendo localStorage:', error);
+                return null;
+            }
+        }
+
+        function safeLocalStorageSet(key, value) {
+            try {
+                localStorage.setItem(key, value);
+                return true;
+            } catch (error) {
+                console.error('Error guardando en localStorage:', error);
+                return false;
+            }
+        }
+
+        // Aplicar ajustes para móviles
+        function applyMobileFixes() {
+            if (isMobileDevice()) {
+                console.log('📱 Dispositivo móvil detectado, aplicando ajustes...');
+                
+                // Mejorar file inputs para móviles
+                document.querySelectorAll('input[type="file"]').forEach(input => {
+                    input.setAttribute('accept', 'image/*, application/pdf');
+                });
+                
+                // Ajustar altura para navegadores móviles
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+                
+                // Prevenir zoom en formularios
+                document.querySelectorAll('input, select, textarea').forEach(element => {
+                    element.addEventListener('focus', function() {
+                        window.scrollTo(0, 0);
+                        document.body.scrollTop = 0;
+                    });
+                });
+            }
+        }
+
         // Sistema de Usuarios
         let currentUser = null;
-        let users = JSON.parse(localStorage.getItem('creditxpress_users')) || [];
+        let users = JSON.parse(safeLocalStorageGet('creditxpress_users')) || [];
 
         // DOM Elements
         const pages = document.querySelectorAll('.page');
@@ -1175,7 +1297,7 @@
         function loadUserCreditStatus() {
             if (!currentUser) return;
 
-            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+            const requests = JSON.parse(safeLocalStorageGet('creditxpress_requests')) || [];
             const userRequests = requests.filter(req => req.clientEmail === currentUser.email);
             
             const approvedRequest = userRequests.find(req => req.status === 'approved');
@@ -1413,9 +1535,12 @@
             
             if (user) {
                 currentUser = user;
-                localStorage.setItem('creditxpress_current_user', JSON.stringify(user));
-                showMainApp();
-                alert('¡Bienvenido de nuevo!');
+                if (safeLocalStorageSet('creditxpress_current_user', JSON.stringify(user))) {
+                    showMainApp();
+                    alert('¡Bienvenido de nuevo!');
+                } else {
+                    alert('Error al guardar sesión. Intenta nuevamente.');
+                }
             } else {
                 alert('Credenciales incorrectas. Por favor verifica tu email y contraseña.');
             }
@@ -1448,10 +1573,10 @@
             };
             
             users.push(newUser);
-            localStorage.setItem('creditxpress_users', JSON.stringify(users));
+            safeLocalStorageSet('creditxpress_users', JSON.stringify(users));
             
             currentUser = newUser;
-            localStorage.setItem('creditxpress_current_user', JSON.stringify(newUser));
+            safeLocalStorageSet('creditxpress_current_user', JSON.stringify(newUser));
             
             showMainApp();
             alert('¡Cuenta creada exitosamente!');
@@ -1461,17 +1586,28 @@
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             currentUser = null;
-            localStorage.removeItem('creditxpress_current_user');
+            try {
+                localStorage.removeItem('creditxpress_current_user');
+            } catch (error) {
+                console.error('Error al cerrar sesión:', error);
+            }
             showAuthPage();
             alert('Sesión cerrada correctamente.');
         });
 
         // Check if user is logged in on page load
         window.addEventListener('load', () => {
-            const savedUser = localStorage.getItem('creditxpress_current_user');
+            applyMobileFixes(); // Aplicar ajustes para móviles
+            
+            const savedUser = safeLocalStorageGet('creditxpress_current_user');
             if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                showMainApp();
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    showMainApp();
+                } catch (error) {
+                    console.error('Error parseando usuario:', error);
+                    showAuthPage();
+                }
             } else {
                 showAuthPage();
             }
@@ -1540,7 +1676,7 @@
                 return;
             }
             
-            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+            const requests = JSON.parse(safeLocalStorageGet('creditxpress_requests')) || [];
             const pendingRequest = requests.find(req => 
                 req.clientEmail === currentUser.email && req.status === 'pending'
             );
@@ -1761,7 +1897,7 @@
         // FUNCIÓN MEJORADA: GUARDAR ARCHIVOS COMO BASE64
         // =============================================
         function saveCreditRequest(amount, term, files) {
-            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+            const requests = JSON.parse(safeLocalStorageGet('creditxpress_requests')) || [];
             
             function fileToBase64(file) {
                 return new Promise((resolve, reject) => {
@@ -1879,7 +2015,7 @@
                     };
                     
                     requests.push(newRequest);
-                    localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
+                    safeLocalStorageSet('creditxpress_requests', JSON.stringify(requests));
                     
                     console.log('✅ Solicitud guardada exitosamente:', newRequest);
                     
@@ -1992,7 +2128,13 @@
             calculateLoan();
             showPage('loanPage');
         });
+
+        // Ajustar para cambios de orientación en móviles
+        window.addEventListener('orientationchange', function() {
+            setTimeout(applyMobileFixes, 100);
+        });
+
+        window.addEventListener('resize', applyMobileFixes);
     </script>
 </body>
 </html>
-
