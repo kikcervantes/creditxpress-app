@@ -645,6 +645,57 @@
                 font-size: 1.2rem;
             }
         }
+
+        /* ========== ESTILOS MEJORADOS PARA SUBIDA DE ARCHIVOS ========== */
+        .file-upload.upload-success {
+            border: 2px solid var(--success) !important;
+            background-color: #f8fff8 !important;
+        }
+
+        .file-upload.upload-success i {
+            color: var(--success) !important;
+        }
+
+        .file-upload.upload-error {
+            border: 2px solid var(--accent) !important;
+            background-color: #fff5f5 !important;
+        }
+
+        /* Indicador de carga */
+        .upload-loading {
+            position: relative;
+        }
+
+        .upload-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Mejoras para mensajes de error */
+        .error-message {
+            color: var(--accent);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .file-upload.error .error-message {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -858,8 +909,9 @@
                         <div class="file-upload" id="idUpload">
                             <i class="fas fa-id-card"></i>
                             <p>Haz clic para subir tu identificación</p>
-                            <input type="file" id="idFile" accept=".pdf,.jpg,.jpeg,.png">
+                            <input type="file" id="idFile" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp">
                             <div class="file-name" id="idFileName">No se ha seleccionado archivo</div>
+                            <div class="error-message" id="idFileError"></div>
                         </div>
                     </div>
                     
@@ -868,8 +920,9 @@
                         <div class="file-upload" id="addressUpload">
                             <i class="fas fa-home"></i>
                             <p>Haz clic para subir comprobante de domicilio</p>
-                            <input type="file" id="addressFile" accept=".pdf,.jpg,.jpeg,.png">
+                            <input type="file" id="addressFile" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp">
                             <div class="file-name" id="addressFileName">No se ha seleccionado archivo</div>
+                            <div class="error-message" id="addressFileError"></div>
                         </div>
                     </div>
                     
@@ -878,8 +931,9 @@
                         <div class="file-upload" id="creditUpload">
                             <i class="fas fa-chart-line"></i>
                             <p>Haz clic para subir reporte de buró de crédito</p>
-                            <input type="file" id="creditFile" accept=".pdf,.jpg,.jpeg,.png">
+                            <input type="file" id="creditFile" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp">
                             <div class="file-name" id="creditFileName">No se ha seleccionado archivo</div>
+                            <div class="error-message" id="creditFileError"></div>
                         </div>
                     </div>
                     
@@ -888,8 +942,9 @@
                         <div class="file-upload" id="bankUpload">
                             <i class="fas fa-university"></i>
                             <p>Haz clic para subir estado de cuenta</p>
-                            <input type="file" id="bankFile" accept=".pdf,.jpg,.jpeg,.png">
+                            <input type="file" id="bankFile" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp">
                             <div class="file-name" id="bankFileName">No se ha seleccionado archivo</div>
+                            <div class="error-message" id="bankFileError"></div>
                         </div>
                     </div>
                     
@@ -1313,7 +1368,7 @@
         }
 
         // =============================================
-        // SISTEMA DE AUTENTICACIÓN (modificado)
+        // SISTEMA DE AUTENTICACIÓN
         // =============================================
 
         function showAuthPage() {
@@ -1325,7 +1380,7 @@
             showPage('homePage');
             mainNav.style.display = 'flex';
             updateUserInfo();
-            loadUserCreditStatus(); // ¡IMPORTANTE! Cargar estado del crédito
+            loadUserCreditStatus();
         }
 
         function updateUserInfo() {
@@ -1423,7 +1478,7 @@
         });
 
         // =============================================
-        // SISTEMA DE NAVEGACIÓN (modificado)
+        // SISTEMA DE NAVEGACIÓN
         // =============================================
 
         function showPage(pageId) {
@@ -1442,7 +1497,6 @@
                 }
             });
 
-            // Recargar datos si es la página de inicio
             if (pageId === 'homePage' && currentUser) {
                 loadUserCreditStatus();
             }
@@ -1476,7 +1530,7 @@
         });
 
         // =============================================
-        // BOTONES DE ACCIÓN (modificados)
+        // BOTONES DE ACCIÓN
         // =============================================
 
         quickLoanBtn.addEventListener('click', (e) => {
@@ -1492,10 +1546,8 @@
             );
             
             if (pendingRequest) {
-                // Si tiene solicitud pendiente, mostrar página de solicitudes
                 showPage('requestsPage');
             } else {
-                // Si no tiene solicitud pendiente, ir a nueva solicitud
                 showPage('loanPage');
             }
         });
@@ -1506,8 +1558,7 @@
         });
 
         // =============================================
-        // EL RESTO DEL CÓDIGO PERMANECE IGUAL
-        // (calculadoras, subida de archivos, etc.)
+        // CALCULADORAS
         // =============================================
 
         // Cálculo con Tasa Global (Interés Simple)
@@ -1515,23 +1566,18 @@
             const amount = parseInt(loanAmountSlider.value);
             const term = parseInt(loanTermSlider.value);
             
-            // Format values for display
             loanAmountValue.textContent = `$${amount.toLocaleString()}`;
             loanTermValue.textContent = `${term} meses`;
             
-            // Tasa global del 10% mensual (120% anual)
-            const monthlyRate = 0.10; // 10% mensual
-            const annualRate = monthlyRate * 12; // 120% anual
+            const monthlyRate = 0.10;
+            const annualRate = monthlyRate * 12;
             
-            // Cálculo con tasa global (interés simple)
             const totalInterest = amount * monthlyRate * term;
             const totalPaymentAmount = amount + totalInterest;
             const monthlyPaymentAmount = totalPaymentAmount / term;
             
-            // CAT aproximado (incluye comisiones)
             const cat = (annualRate + 0.2) * 100;
             
-            // Update display
             monthlyPayment.textContent = `$${Math.round(monthlyPaymentAmount).toLocaleString()}`;
             interestRate.textContent = `${Math.round(annualRate * 100)}%`;
             catRate.textContent = `${Math.round(cat)}%`;
@@ -1543,18 +1589,15 @@
             const amount = parseInt(calcAmount.value);
             const term = parseInt(calcTerm.value);
             
-            // Tasa global del 10% mensual
             const monthlyRate = 0.10;
             const totalInterest = amount * monthlyRate * term;
             const totalPaymentAmount = amount + totalInterest;
             const monthlyPaymentAmount = totalPaymentAmount / term;
             
-            // Update display
             calcMonthly.textContent = `$${Math.round(monthlyPaymentAmount).toLocaleString()}`;
             calcInterest.textContent = `$${Math.round(totalInterest).toLocaleString()}`;
             calcTotal.textContent = `$${Math.round(totalPaymentAmount).toLocaleString()}`;
             
-            // Generar tabla de amortización
             generateAmortizationTable(amount, term, monthlyRate, monthlyPaymentAmount);
         }
 
@@ -1568,7 +1611,6 @@
                 const principal = monthlyPayment - interest;
                 balance -= principal;
                 
-                // En el último mes, ajustar para que el saldo sea 0
                 const finalBalance = month === term ? 0 : Math.max(0, balance);
                 
                 html += `
@@ -1595,18 +1637,60 @@
         calcAmount.addEventListener('input', updateCalculator);
         calcTerm.addEventListener('change', updateCalculator);
 
-        // Sistema de subida de archivos
+        // =============================================
+        // SISTEMA MEJORADO DE SUBIDA DE ARCHIVOS
+        // =============================================
+
+        // Función para formatear tamaño de archivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Función auxiliar para nombres de documentos
+        function getDocumentName(fileType) {
+            const names = {
+                'idFile': 'Identificación',
+                'addressFile': 'Comprobante de domicilio',
+                'creditFile': 'Buró de crédito',
+                'bankFile': 'Estado de cuenta'
+            };
+            return names[fileType] || fileType;
+        }
+
+        // Función para determinar tipo de archivo
+        function getFileType(file) {
+            if (!file) return 'unknown';
+            
+            if (file.type.includes('image')) {
+                return 'image';
+            } else if (file.type.includes('pdf')) {
+                return 'pdf';
+            } else if (file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                return 'image';
+            } else if (file.name.match(/\.pdf$/i)) {
+                return 'pdf';
+            } else {
+                return 'document';
+            }
+        }
+
+        // Configurar sistema de subida de archivos
         const fileUploads = [
-            { id: 'idUpload', fileInput: 'idFile', fileName: 'idFileName' },
-            { id: 'addressUpload', fileInput: 'addressFile', fileName: 'addressFileName' },
-            { id: 'creditUpload', fileInput: 'creditFile', fileName: 'creditFileName' },
-            { id: 'bankUpload', fileInput: 'bankFile', fileName: 'bankFileName' }
+            { id: 'idUpload', fileInput: 'idFile', fileName: 'idFileName', error: 'idFileError' },
+            { id: 'addressUpload', fileInput: 'addressFile', fileName: 'addressFileName', error: 'addressFileError' },
+            { id: 'creditUpload', fileInput: 'creditFile', fileName: 'creditFileName', error: 'creditFileError' },
+            { id: 'bankUpload', fileInput: 'bankFile', fileName: 'bankFileName', error: 'bankFileError' }
         ];
 
         fileUploads.forEach(upload => {
             const uploadElement = document.getElementById(upload.id);
             const fileInput = document.getElementById(upload.fileInput);
             const fileName = document.getElementById(upload.fileName);
+            const errorElement = document.getElementById(upload.error);
             
             uploadElement.addEventListener('click', () => {
                 fileInput.click();
@@ -1614,8 +1698,285 @@
             
             fileInput.addEventListener('change', (e) => {
                 if (e.target.files.length > 0) {
-                    fileName.textContent = e.target.files[0].name;
+                    const file = e.target.files[0];
+                    
+                    const maxSize = 10 * 1024 * 1024;
+                    const allowedTypes = [
+                        'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
+                        'application/pdf', 'image/webp'
+                    ];
+                    
+                    if (file.size > maxSize) {
+                        errorElement.textContent = `El archivo es demasiado grande. Máximo 10MB.`;
+                        uploadElement.classList.add('error');
+                        uploadElement.classList.remove('upload-success');
+                        fileInput.value = '';
+                        fileName.textContent = 'No se ha seleccionado archivo';
+                        return;
+                    }
+                    
+                    if (!allowedTypes.includes(file.type) && 
+                        !file.name.match(/\.(jpg|jpeg|png|gif|pdf|webp)$/i)) {
+                        errorElement.textContent = `Tipo de archivo no permitido. Use JPG, PNG, GIF, PDF o WEBP.`;
+                        uploadElement.classList.add('error');
+                        uploadElement.classList.remove('upload-success');
+                        fileInput.value = '';
+                        fileName.textContent = 'No se ha seleccionado archivo';
+                        return;
+                    }
+                    
+                    const fileSize = formatFileSize(file.size);
+                    fileName.textContent = `${file.name} (${fileSize})`;
+                    errorElement.textContent = '';
+                    uploadElement.classList.remove('error');
+                    uploadElement.classList.add('upload-success');
                 }
+            });
+            
+            uploadElement.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadElement.style.borderColor = 'var(--secondary)';
+                uploadElement.style.backgroundColor = '#f0f8ff';
+            });
+            
+            uploadElement.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                if (!uploadElement.classList.contains('upload-success')) {
+                    uploadElement.style.borderColor = 'var(--border)';
+                    uploadElement.style.backgroundColor = '';
+                }
+            });
+            
+            uploadElement.addEventListener('drop', (e) => {
+                e.preventDefault();
+                if (e.dataTransfer.files.length > 0) {
+                    fileInput.files = e.dataTransfer.files;
+                    const event = new Event('change', { bubbles: true });
+                    fileInput.dispatchEvent(event);
+                }
+            });
+        });
+
+        // =============================================
+        // FUNCIÓN MEJORADA: GUARDAR ARCHIVOS COMO BASE64
+        // =============================================
+        function saveCreditRequest(amount, term, files) {
+            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+            
+            function fileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    if (!file) {
+                        reject(new Error('Archivo no válido'));
+                        return;
+                    }
+
+                    const maxSize = 10 * 1024 * 1024;
+                    if (file.size > maxSize) {
+                        reject(new Error(`El archivo ${file.name} es demasiado grande. Máximo 10MB.`));
+                        return;
+                    }
+
+                    const allowedTypes = [
+                        'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
+                        'application/pdf', 'image/webp'
+                    ];
+                    
+                    if (!allowedTypes.includes(file.type) && 
+                        !file.name.match(/\.(jpg|jpeg|png|gif|pdf|webp)$/i)) {
+                        reject(new Error(`Tipo de archivo no permitido: ${file.name}. Solo JPG, PNG, GIF, PDF.`));
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    
+                    reader.onload = () => {
+                        if (reader.result && reader.result.toString().startsWith('data:')) {
+                            resolve(reader.result);
+                        } else {
+                            reject(new Error('Error al convertir el archivo a Base64'));
+                        }
+                    };
+                    
+                    reader.onerror = (error) => {
+                        console.error('Error en FileReader:', error);
+                        reject(new Error(`Error al leer el archivo: ${file.name}`));
+                    };
+                    
+                    reader.onabort = () => {
+                        reject(new Error('Lectura del archivo cancelada'));
+                    };
+                    
+                    try {
+                        reader.readAsDataURL(file);
+                    } catch (error) {
+                        reject(new Error(`Error al procesar el archivo: ${file.name}`));
+                    }
+                });
+            }
+
+            alert('📤 Procesando documentos... Por favor espera.');
+
+            const processFiles = async () => {
+                try {
+                    const processedFiles = {};
+                    const fileTypes = ['idFile', 'addressFile', 'creditFile', 'bankFile'];
+                    
+                    for (const fileType of fileTypes) {
+                        const file = files[fileType];
+                        if (file) {
+                            try {
+                                processedFiles[fileType] = await fileToBase64(file);
+                                console.log(`✅ ${fileType} procesado correctamente`);
+                            } catch (error) {
+                                console.error(`❌ Error en ${fileType}:`, error);
+                                throw new Error(`Error en ${getDocumentName(fileType)}: ${error.message}`);
+                            }
+                        }
+                    }
+
+                    const documents = {
+                        identification: { 
+                            type: getFileType(files.idFile),
+                            name: files.idFile.name,
+                            data: processedFiles.idFile,
+                            size: files.idFile.size,
+                            uploadedAt: new Date().toISOString()
+                        },
+                        address: { 
+                            type: getFileType(files.addressFile),
+                            name: files.addressFile.name,
+                            data: processedFiles.addressFile,
+                            size: files.addressFile.size,
+                            uploadedAt: new Date().toISOString()
+                        },
+                        credit: { 
+                            type: getFileType(files.creditFile),
+                            name: files.creditFile.name,
+                            data: processedFiles.creditFile,
+                            size: files.creditFile.size,
+                            uploadedAt: new Date().toISOString()
+                        },
+                        bank: { 
+                            type: getFileType(files.bankFile),
+                            name: files.bankFile.name,
+                            data: processedFiles.bankFile,
+                            size: files.bankFile.size,
+                            uploadedAt: new Date().toISOString()
+                        }
+                    };
+                    
+                    const newRequest = {
+                        id: Date.now(),
+                        clientName: currentUser.name,
+                        clientEmail: currentUser.email,
+                        clientPhone: currentUser.phone,
+                        amount: amount,
+                        term: term,
+                        status: 'pending',
+                        timestamp: new Date().toISOString(),
+                        documents: documents,
+                        lastUpdated: new Date().toISOString()
+                    };
+                    
+                    requests.push(newRequest);
+                    localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
+                    
+                    console.log('✅ Solicitud guardada exitosamente:', newRequest);
+                    
+                    showSuccessMessage(newRequest.id, documents);
+                    
+                    resetFileUploads();
+                    
+                    loadUserCreditStatus();
+                    showPage('homePage');
+                    
+                } catch (error) {
+                    console.error('❌ Error general al procesar archivos:', error);
+                    alert(`❌ Error al procesar documentos:\n\n${error.message}\n\nPor favor intenta nuevamente con archivos más pequeños o en formato diferente.`);
+                }
+            };
+
+            processFiles();
+        }
+
+        // Función para mostrar mensaje de éxito
+        function showSuccessMessage(requestId, documents) {
+            let message = `✅ ¡Solicitud #${requestId} enviada exitosamente!\n\n`;
+            message += `📋 Documentos procesados:\n`;
+            
+            Object.entries(documents).forEach(([docType, docData]) => {
+                const docName = getDocumentName(docType + 'File');
+                const fileSize = formatFileSize(docData.size);
+                message += `• ${docName}: ${docData.name} (${fileSize})\n`;
+            });
+            
+            message += `\n📊 Resumen del crédito:\n`;
+            message += `• Monto: $${parseInt(document.getElementById('loanAmount').value).toLocaleString()}\n`;
+            message += `• Plazo: ${document.getElementById('loanTerm').value} meses\n`;
+            message += `• Cuota mensual: ${document.getElementById('monthlyPayment').textContent}\n\n`;
+            message += `⏳ Tu solicitud será revisada pronto.`;
+            
+            alert(message);
+        }
+
+        // Función para limpiar los uploads
+        function resetFileUploads() {
+            document.getElementById('idFile').value = '';
+            document.getElementById('addressFile').value = '';
+            document.getElementById('creditFile').value = '';
+            document.getElementById('bankFile').value = '';
+            
+            document.querySelectorAll('.file-name').forEach(el => {
+                el.textContent = 'No se ha seleccionado archivo';
+            });
+            
+            document.querySelectorAll('.file-upload').forEach(upload => {
+                upload.classList.remove('upload-success', 'error');
+            });
+            
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.textContent = '';
+            });
+        }
+
+        // =============================================
+        // BOTÓN MEJORADO: PROCESAR ARCHIVOS
+        // =============================================
+        submitDocumentsBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                alert('Debes iniciar sesión primero');
+                showPage('authPage');
+                return;
+            }
+            
+            const idFile = document.getElementById('idFile').files[0];
+            const addressFile = document.getElementById('addressFile').files[0];
+            const creditFile = document.getElementById('creditFile').files[0];
+            const bankFile = document.getElementById('bankFile').files[0];
+            
+            if (!idFile || !addressFile || !creditFile || !bankFile) {
+                alert('❌ Por favor sube TODOS los documentos requeridos.');
+                
+                fileUploads.forEach(upload => {
+                    const fileInput = document.getElementById(upload.fileInput);
+                    const uploadElement = document.getElementById(upload.id);
+                    
+                    if (!fileInput.files[0]) {
+                        uploadElement.style.borderColor = 'var(--accent)';
+                        uploadElement.style.backgroundColor = '#fff5f5';
+                    }
+                });
+                
+                return;
+            }
+            
+            const loanAmount = parseInt(document.getElementById('loanAmount').value);
+            const loanTerm = parseInt(document.getElementById('loanTerm').value);
+            
+            saveCreditRequest(loanAmount, loanTerm, {
+                idFile, addressFile, creditFile, bankFile
             });
         });
 
@@ -1624,368 +1985,8 @@
             showPage('documentsPage');
         });
 
-// =============================================
-// FUNCIÓN MEJORADA: GUARDAR ARCHIVOS COMO BASE64 CON MANEJO DE ERRORES
-// =============================================
-function saveCreditRequest(amount, term, files) {
-    const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
-    
-    // Función mejorada para convertir archivo a Base64
-    function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
-            // Validar que el archivo existe
-            if (!file) {
-                reject(new Error('Archivo no válido'));
-                return;
-            }
-
-            // Validar tamaño máximo (10MB)
-            const maxSize = 10 * 1024 * 1024; // 10MB
-            if (file.size > maxSize) {
-                reject(new Error(`El archivo ${file.name} es demasiado grande. Máximo 10MB.`));
-                return;
-            }
-
-            // Validar tipos de archivo permitidos
-            const allowedTypes = [
-                'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
-                'application/pdf', 'image/webp'
-            ];
-            
-            if (!allowedTypes.includes(file.type) && 
-                !file.name.match(/\.(jpg|jpeg|png|gif|pdf|webp)$/i)) {
-                reject(new Error(`Tipo de archivo no permitido: ${file.name}. Solo JPG, PNG, GIF, PDF.`));
-                return;
-            }
-
-            const reader = new FileReader();
-            
-            reader.onload = () => {
-                // Verificar que la lectura fue exitosa
-                if (reader.result && reader.result.toString().startsWith('data:')) {
-                    resolve(reader.result);
-                } else {
-                    reject(new Error('Error al convertir el archivo a Base64'));
-                }
-            };
-            
-            reader.onerror = (error) => {
-                console.error('Error en FileReader:', error);
-                reject(new Error(`Error al leer el archivo: ${file.name}`));
-            };
-            
-            reader.onabort = () => {
-                reject(new Error('Lectura del archivo cancelada'));
-            };
-            
-            try {
-                reader.readAsDataURL(file);
-            } catch (error) {
-                reject(new Error(`Error al procesar el archivo: ${file.name}`));
-            }
-        });
-    }
-
-    // Mostrar progreso
-    alert('📤 Procesando documentos... Por favor espera.');
-
-    // Procesar todos los archivos con manejo individual de errores
-    const processFiles = async () => {
-        try {
-            const processedFiles = {};
-            const fileTypes = ['idFile', 'addressFile', 'creditFile', 'bankFile'];
-            
-            for (const fileType of fileTypes) {
-                const file = files[fileType];
-                if (file) {
-                    try {
-                        processedFiles[fileType] = await fileToBase64(file);
-                        console.log(`✅ ${fileType} procesado correctamente`);
-                    } catch (error) {
-                        console.error(`❌ Error en ${fileType}:`, error);
-                        throw new Error(`Error en ${getDocumentName(fileType)}: ${error.message}`);
-                    }
-                }
-            }
-
-            // Crear objeto de documentos
-            const documents = {
-                identification: { 
-                    type: getFileType(files.idFile),
-                    name: files.idFile.name,
-                    data: processedFiles.idFile,
-                    size: files.idFile.size,
-                    uploadedAt: new Date().toISOString()
-                },
-                address: { 
-                    type: getFileType(files.addressFile),
-                    name: files.addressFile.name,
-                    data: processedFiles.addressFile,
-                    size: files.addressFile.size,
-                    uploadedAt: new Date().toISOString()
-                },
-                credit: { 
-                    type: getFileType(files.creditFile),
-                    name: files.creditFile.name,
-                    data: processedFiles.creditFile,
-                    size: files.creditFile.size,
-                    uploadedAt: new Date().toISOString()
-                },
-                bank: { 
-                    type: getFileType(files.bankFile),
-                    name: files.bankFile.name,
-                    data: processedFiles.bankFile,
-                    size: files.bankFile.size,
-                    uploadedAt: new Date().toISOString()
-                }
-            };
-            
-            // Crear nueva solicitud
-            const newRequest = {
-                id: Date.now(),
-                clientName: currentUser.name,
-                clientEmail: currentUser.email,
-                clientPhone: currentUser.phone,
-                amount: amount,
-                term: term,
-                status: 'pending',
-                timestamp: new Date().toISOString(),
-                documents: documents,
-                lastUpdated: new Date().toISOString()
-            };
-            
-            // Guardar en localStorage
-            requests.push(newRequest);
-            localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
-            
-            console.log('✅ Solicitud guardada exitosamente:', newRequest);
-            
-            // Mostrar confirmación detallada
-            showSuccessMessage(newRequest.id, documents);
-            
-            // Limpiar formulario
-            resetFileUploads();
-            
-            // Recargar estado del crédito
-            loadUserCreditStatus();
-            showPage('homePage');
-            
-        } catch (error) {
-            console.error('❌ Error general al procesar archivos:', error);
-            alert(`❌ Error al procesar documentos:\n\n${error.message}\n\nPor favor intenta nuevamente con archivos más pequeños o en formato diferente.`);
-        }
-    };
-
-    // Ejecutar procesamiento
-    processFiles();
-}
-
-// Función auxiliar para determinar tipo de archivo
-function getFileType(file) {
-    if (!file) return 'unknown';
-    
-    if (file.type.includes('image')) {
-        return 'image';
-    } else if (file.type.includes('pdf')) {
-        return 'pdf';
-    } else if (file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-        return 'image';
-    } else if (file.name.match(/\.pdf$/i)) {
-        return 'pdf';
-    } else {
-        return 'document';
-    }
-}
-
-// Función auxiliar para nombres de documentos
-function getDocumentName(fileType) {
-    const names = {
-        'idFile': 'Identificación',
-        'addressFile': 'Comprobante de domicilio',
-        'creditFile': 'Buró de crédito',
-        'bankFile': 'Estado de cuenta'
-    };
-    return names[fileType] || fileType;
-}
-
-// Función para mostrar mensaje de éxito detallado
-function showSuccessMessage(requestId, documents) {
-    let message = `✅ ¡Solicitud #${requestId} enviada exitosamente!\n\n`;
-    message += `📋 Documentos procesados:\n`;
-    
-    Object.entries(documents).forEach(([docType, docData]) => {
-        const docName = getDocumentName(docType + 'File');
-        const fileSize = formatFileSize(docData.size);
-        message += `• ${docName}: ${docData.name} (${fileSize})\n`;
-    });
-    
-    message += `\n📊 Resumen del crédito:\n`;
-    message += `• Monto: $${parseInt(document.getElementById('loanAmount').value).toLocaleString()}\n`;
-    message += `• Plazo: ${document.getElementById('loanTerm').value} meses\n`;
-    message += `• Cuota mensual: ${document.getElementById('monthlyPayment').textContent}\n\n`;
-    message += `⏳ Tu solicitud será revisada pronto.`;
-    
-    alert(message);
-}
-
-// Función para formatear tamaño de archivo
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-// Función para limpiar los uploads de archivos
-function resetFileUploads() {
-    // Limpiar inputs de archivo
-    document.getElementById('idFile').value = '';
-    document.getElementById('addressFile').value = '';
-    document.getElementById('creditFile').value = '';
-    document.getElementById('bankFile').value = '';
-    
-    // Limpiar nombres de archivo mostrados
-    document.querySelectorAll('.file-name').forEach(el => {
-        el.textContent = 'No se ha seleccionado archivo';
-    });
-    
-    // Remover clases de éxito
-    document.querySelectorAll('.file-upload').forEach(upload => {
-        upload.classList.remove('upload-success');
-    });
-}
-
-// =============================================
-// SISTEMA MEJORADO DE SUBIDA DE ARCHIVOS
-// =============================================
-const fileUploads = [
-    { id: 'idUpload', fileInput: 'idFile', fileName: 'idFileName' },
-    { id: 'addressUpload', fileInput: 'addressFile', fileName: 'addressFileName' },
-    { id: 'creditUpload', fileInput: 'creditFile', fileName: 'creditFileName' },
-    { id: 'bankUpload', fileInput: 'bankFile', fileName: 'bankFileName' }
-];
-
-fileUploads.forEach(upload => {
-    const uploadElement = document.getElementById(upload.id);
-    const fileInput = document.getElementById(upload.fileInput);
-    const fileName = document.getElementById(upload.fileName);
-    
-    uploadElement.addEventListener('click', () => {
-        fileInput.click();
-    });
-    
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            const file = e.target.files[0];
-            
-            // Validaciones básicas del archivo
-            const maxSize = 10 * 1024 * 1024; // 10MB
-            const allowedTypes = [
-                'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
-                'application/pdf', 'image/webp'
-            ];
-            
-            if (file.size > maxSize) {
-                alert(`❌ El archivo "${file.name}" es demasiado grande. Máximo 10MB.`);
-                fileInput.value = '';
-                fileName.textContent = 'No se ha seleccionado archivo';
-                return;
-            }
-            
-            if (!allowedTypes.includes(file.type) && 
-                !file.name.match(/\.(jpg|jpeg|png|gif|pdf|webp)$/i)) {
-                alert(`❌ Tipo de archivo no permitido: "${file.name}".\nSolo se permiten: JPG, PNG, GIF, PDF, WEBP.`);
-                fileInput.value = '';
-                fileName.textContent = 'No se ha seleccionado archivo';
-                return;
-            }
-            
-            // Mostrar información del archivo
-            const fileSize = formatFileSize(file.size);
-            fileName.textContent = `${file.name} (${fileSize})`;
-            
-            // Agregar indicador visual de éxito
-            uploadElement.classList.add('upload-success');
-            uploadElement.style.borderColor = 'var(--success)';
-            uploadElement.style.backgroundColor = '#f8fff8';
-        }
-    });
-    
-    // Efecto visual al arrastrar
-    uploadElement.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadElement.style.borderColor = 'var(--secondary)';
-        uploadElement.style.backgroundColor = '#f0f8ff';
-    });
-    
-    uploadElement.addEventListener('dragleave', (e) => {
-        e.preventDefault();
-        if (!uploadElement.classList.contains('upload-success')) {
-            uploadElement.style.borderColor = 'var(--border)';
-            uploadElement.style.backgroundColor = '';
-        }
-    });
-    
-    uploadElement.addEventListener('drop', (e) => {
-        e.preventDefault();
-        if (e.dataTransfer.files.length > 0) {
-            fileInput.files = e.dataTransfer.files;
-            const event = new Event('change', { bubbles: true });
-            fileInput.dispatchEvent(event);
-        }
-    });
-});
-
-// =============================================
-// BOTÓN MEJORADO: PROCESAR ARCHIVOS
-// =============================================
-submitDocumentsBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    
-    // 1. VERIFICAR QUE ESTÉ LOGUEADO
-    if (!currentUser) {
-        alert('Debes iniciar sesión primero');
-        showPage('authPage');
-        return;
-    }
-    
-    // 2. VERIFICAR ARCHIVOS
-    const idFile = document.getElementById('idFile').files[0];
-    const addressFile = document.getElementById('addressFile').files[0];
-    const creditFile = document.getElementById('creditFile').files[0];
-    const bankFile = document.getElementById('bankFile').files[0];
-    
-    if (!idFile || !addressFile || !creditFile || !bankFile) {
-        alert('❌ Por favor sube TODOS los documentos requeridos.');
-        
-        // Resaltar los que faltan
-        fileUploads.forEach(upload => {
-            const fileInput = document.getElementById(upload.fileInput);
-            const uploadElement = document.getElementById(upload.id);
-            
-            if (!fileInput.files[0]) {
-                uploadElement.style.borderColor = 'var(--accent)';
-                uploadElement.style.backgroundColor = '#fff5f5';
-            }
-        });
-        
-        return;
-    }
-    
-    // 3. OBTENER DATOS DEL PRÉSTAMO
-    const loanAmount = parseInt(document.getElementById('loanAmount').value);
-    const loanTerm = parseInt(document.getElementById('loanTerm').value);
-    
-    // 4. GUARDAR EN CRM CON ARCHIVOS BASE64 (manejo mejorado)
-    saveCreditRequest(loanAmount, loanTerm, {
-        idFile, addressFile, creditFile, bankFile
-    });
-});
-
         applyFromCalcBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            // Llenar el formulario de préstamo con los valores de la calculadora
             loanAmountSlider.value = calcAmount.value;
             loanTermSlider.value = calcTerm.value;
             calculateLoan();
