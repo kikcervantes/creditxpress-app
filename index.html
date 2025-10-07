@@ -54,11 +54,6 @@
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
             min-height: 100vh;
-            min-height: -webkit-fill-available;
-        }
-        
-        html {
-            height: -webkit-fill-available;
         }
         
         #app {
@@ -68,7 +63,6 @@
             background-color: white;
         }
         
-        /* Header de la App */
         .app-header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
@@ -112,7 +106,6 @@
             color: white;
         }
         
-        /* Navegación Inferior */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -148,7 +141,6 @@
             margin-bottom: 4px;
         }
         
-        /* Contenido Principal */
         .app-content {
             flex: 1;
             overflow-y: auto;
@@ -157,7 +149,6 @@
             -webkit-overflow-scrolling: touch;
         }
         
-        /* Tarjetas */
         .card {
             background-color: white;
             border-radius: 12px;
@@ -180,7 +171,6 @@
             color: var(--primary);
         }
         
-        /* Sección de Bienvenida */
         .welcome-section {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
@@ -207,7 +197,6 @@
             margin-bottom: 1.5rem;
         }
         
-        /* Botones */
         .btn {
             display: inline-block;
             padding: 12px 20px;
@@ -220,14 +209,6 @@
             text-align: center;
             font-size: 1rem;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-        
-        @media (max-width: 768px) {
-            .btn {
-                padding: 15px 20px;
-                font-size: 1.1rem;
-            }
         }
         
         .btn-primary {
@@ -236,18 +217,10 @@
             width: 100%;
         }
         
-        .btn-primary:hover {
-            background-color: #c0392b;
-        }
-
         .btn-success {
             background-color: var(--success);
             color: white;
             width: 100%;
-        }
-        
-        .btn-success:hover {
-            background-color: #219653;
         }
         
         .btn-outline {
@@ -256,17 +229,11 @@
             border: 2px solid white;
         }
         
-        .btn-outline:hover {
-            background-color: white;
-            color: var(--primary);
-        }
-        
         .btn-secondary {
             background-color: var(--secondary);
             color: white;
         }
         
-        /* Estado de Crédito */
         .credit-status {
             display: flex;
             justify-content: space-between;
@@ -285,7 +252,6 @@
             font-size: 0.9rem;
         }
 
-        /* Badges de estado */
         .status-badge {
             padding: 6px 12px;
             border-radius: 20px;
@@ -310,12 +276,6 @@
             color: #721c24;
         }
         
-        .status-completed {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        /* Acciones Rápidas */
         .quick-actions {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -332,18 +292,6 @@
             color: var(--text);
             transition: all 0.3s ease;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-        
-        @media (max-width: 768px) {
-            .action-card {
-                padding: 1.2rem;
-            }
-        }
-        
-        .action-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .action-icon {
@@ -357,7 +305,6 @@
             font-size: 0.9rem;
         }
         
-        /* Historial de Transacciones */
         .transaction-list {
             list-style: none;
         }
@@ -368,10 +315,6 @@
             align-items: center;
             padding: 1rem 0;
             border-bottom: 1px solid var(--border);
-        }
-        
-        .transaction-item:last-child {
-            border-bottom: none;
         }
         
         .transaction-info {
@@ -413,7 +356,6 @@
             color: var(--accent);
         }
         
-        /* Formularios */
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -434,12 +376,6 @@
             background-color: var(--light);
         }
         
-        @media (max-width: 768px) {
-            .form-control {
-                font-size: 16px; /* Previene zoom en iOS */
-            }
-        }
-        
         .range-container {
             display: flex;
             align-items: center;
@@ -453,7 +389,6 @@
             color: var(--primary);
         }
         
-        /* Subida de archivos */
         .file-upload {
             border: 2px dashed var(--border);
             border-radius: 8px;
@@ -463,21 +398,6 @@
             cursor: pointer;
             transition: all 0.3s ease;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-        
-        @media (max-width: 768px) {
-            .file-upload {
-                padding: 1.5rem;
-                min-height: 120px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
-            
-            .file-upload i {
-                font-size: 1.5rem;
-            }
         }
         
         .file-upload:hover {
@@ -501,7 +421,6 @@
             color: var(--gray);
         }
         
-        /* Calculadora */
         .calculator-results {
             background-color: var(--light);
             padding: 1.5rem;
@@ -517,12 +436,6 @@
             border-bottom: 1px solid var(--border);
         }
         
-        .result-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        
         .result-label {
             color: var(--gray);
         }
@@ -532,7 +445,6 @@
             color: var(--primary);
         }
         
-        /* Tabla de Amortización */
         .amortization-table {
             width: 100%;
             border-collapse: collapse;
@@ -559,7 +471,6 @@
             margin-top: 1rem;
         }
         
-        /* Página de Perfil */
         .profile-header {
             text-align: center;
             margin-bottom: 2rem;
@@ -601,11 +512,6 @@
             text-decoration: none;
             color: var(--text);
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-        
-        .menu-item:last-child {
-            border-bottom: none;
         }
         
         .menu-icon {
@@ -638,7 +544,6 @@
             color: var(--gray);
         }
         
-        /* Estados de Página */
         .page {
             display: none;
         }
@@ -647,7 +552,6 @@
             display: block;
         }
         
-        /* Notificaciones */
         .notification-badge {
             background-color: var(--accent);
             color: white;
@@ -663,7 +567,6 @@
             right: -5px;
         }
         
-        /* Animaciones */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -673,7 +576,6 @@
             animation: fadeIn 0.3s ease forwards;
         }
         
-        /* Login/Register */
         .auth-container {
             max-width: 400px;
             margin: 0 auto;
@@ -693,7 +595,6 @@
             cursor: pointer;
             border-bottom: 3px solid transparent;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
         }
         
         .auth-tab.active {
@@ -702,18 +603,6 @@
             font-weight: 600;
         }
         
-        /* Responsive */
-        @media (max-width: 380px) {
-            .quick-actions {
-                grid-template-columns: 1fr;
-            }
-            
-            .logo h1 {
-                font-size: 1.2rem;
-            }
-        }
-
-        /* ========== ESTILOS MEJORADOS PARA SUBIDA DE ARCHIVOS ========== */
         .file-upload.upload-success {
             border: 2px solid var(--success) !important;
             background-color: #f8fff8 !important;
@@ -728,31 +617,6 @@
             background-color: #fff5f5 !important;
         }
 
-        /* Indicador de carga */
-        .upload-loading {
-            position: relative;
-        }
-
-        .upload-loading::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            margin: -10px 0 0 -10px;
-            border: 2px solid transparent;
-            border-top: 2px solid var(--secondary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Mejoras para mensajes de error */
         .error-message {
             color: var(--accent);
             font-size: 0.8rem;
@@ -764,32 +628,38 @@
             display: block;
         }
 
-        /* Estados de carga mejorados */
-        .file-upload.uploading {
-            position: relative;
-            pointer-events: none;
+        @media (max-width: 768px) {
+            .file-upload {
+                padding: 1.5rem;
+                min-height: 120px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            
+            .file-upload i {
+                font-size: 1.5rem;
+            }
+            
+            .btn {
+                padding: 15px 20px;
+                font-size: 1.1rem;
+            }
         }
 
-        .file-upload.uploading::after {
-            content: '📤 Subiendo...';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: var(--primary);
-            border-radius: 8px;
+        @media (max-width: 380px) {
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo h1 {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
 <body>
     <div id="app">
-        <!-- Header -->
         <header class="app-header">
             <div class="header-left">
                 <div class="logo">
@@ -805,9 +675,7 @@
             </div>
         </header>
 
-        <!-- Contenido Principal -->
         <main class="app-content">
-            <!-- Página de Login/Register -->
             <section id="authPage" class="page active">
                 <div class="auth-container">
                     <div class="auth-tabs">
@@ -815,7 +683,6 @@
                         <div class="auth-tab" data-tab="register">Registrarse</div>
                     </div>
                     
-                    <!-- Login Form -->
                     <div id="loginForm" class="auth-form">
                         <div class="form-group">
                             <label for="loginEmail" class="form-label">Correo Electrónico</label>
@@ -828,7 +695,6 @@
                         <button class="btn btn-primary" id="loginBtn">Ingresar</button>
                     </div>
                     
-                    <!-- Register Form -->
                     <div id="registerForm" class="auth-form" style="display: none;">
                         <div class="form-group">
                             <label for="registerName" class="form-label">Nombre Completo</label>
@@ -855,9 +721,7 @@
                 </div>
             </section>
 
-            <!-- Página de Inicio -->
             <section id="homePage" class="page">
-                <!-- Sección de Estado del Crédito -->
                 <div class="welcome-section" id="creditStatusSection">
                     <div class="welcome-text">
                         <h2>¡Hola, <span id="userName">Usuario</span>!</h2>
@@ -866,7 +730,6 @@
                     <button class="btn btn-primary" id="quickLoanBtn">Solicitar $5,000</button>
                 </div>
 
-                <!-- Información del Crédito Actual -->
                 <div class="card" id="currentCreditCard" style="display: none;">
                     <div class="card-header">
                         <h3 class="card-title">Tu Crédito Actual</h3>
@@ -923,24 +786,20 @@
                         <a href="#" style="color: var(--primary); font-size: 0.9rem;">Ver todo</a>
                     </div>
                     <ul class="transaction-list" id="transactionsList">
-                        <!-- Las transacciones se cargarán dinámicamente -->
                     </ul>
                 </div>
             </section>
 
-            <!-- Página de Mis Solicitudes -->
             <section id="requestsPage" class="page">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Mis Solicitudes de Crédito</h3>
                     </div>
                     <div id="userRequestsList">
-                        <!-- Las solicitudes del usuario se cargarán aquí -->
                     </div>
                 </div>
             </section>
 
-            <!-- Página de Solicitud de Crédito -->
             <section id="loanPage" class="page">
                 <div class="card">
                     <div class="card-header">
@@ -986,7 +845,6 @@
                 </div>
             </section>
 
-            <!-- Página de Documentos -->
             <section id="documentsPage" class="page">
                 <div class="card">
                     <div class="card-header">
@@ -998,7 +856,7 @@
                         <div class="file-upload" id="idUpload">
                             <i class="fas fa-id-card"></i>
                             <p>Haz clic para subir tu identificación</p>
-                            <input type="file" id="idFile" accept="image/*, application/pdf">
+                            <input type="file" id="idFile" accept="image/*, application/pdf, .jpg, .jpeg, .png, .pdf">
                             <div class="file-name" id="idFileName">No se ha seleccionado archivo</div>
                             <div class="error-message" id="idFileError"></div>
                         </div>
@@ -1009,7 +867,7 @@
                         <div class="file-upload" id="addressUpload">
                             <i class="fas fa-home"></i>
                             <p>Haz clic para subir comprobante de domicilio</p>
-                            <input type="file" id="addressFile" accept="image/*, application/pdf">
+                            <input type="file" id="addressFile" accept="image/*, application/pdf, .jpg, .jpeg, .png, .pdf">
                             <div class="file-name" id="addressFileName">No se ha seleccionado archivo</div>
                             <div class="error-message" id="addressFileError"></div>
                         </div>
@@ -1020,7 +878,7 @@
                         <div class="file-upload" id="creditUpload">
                             <i class="fas fa-chart-line"></i>
                             <p>Haz clic para subir reporte de buró de crédito</p>
-                            <input type="file" id="creditFile" accept="image/*, application/pdf">
+                            <input type="file" id="creditFile" accept="image/*, application/pdf, .jpg, .jpeg, .png, .pdf">
                             <div class="file-name" id="creditFileName">No se ha seleccionado archivo</div>
                             <div class="error-message" id="creditFileError"></div>
                         </div>
@@ -1031,7 +889,7 @@
                         <div class="file-upload" id="bankUpload">
                             <i class="fas fa-university"></i>
                             <p>Haz clic para subir estado de cuenta</p>
-                            <input type="file" id="bankFile" accept="image/*, application/pdf">
+                            <input type="file" id="bankFile" accept="image/*, application/pdf, .jpg, .jpeg, .png, .pdf">
                             <div class="file-name" id="bankFileName">No se ha seleccionado archivo</div>
                             <div class="error-message" id="bankFileError"></div>
                         </div>
@@ -1041,7 +899,6 @@
                 </div>
             </section>
 
-            <!-- Página de Calculadora -->
             <section id="calculatorPage" class="page">
                 <div class="card">
                     <div class="card-header">
@@ -1096,7 +953,6 @@
                                 </tr>
                             </thead>
                             <tbody id="amortizationBody">
-                                <!-- Aquí se generará la tabla de amortización -->
                             </tbody>
                         </table>
                     </div>
@@ -1105,7 +961,6 @@
                 </div>
             </section>
 
-            <!-- Página de Perfil -->
             <section id="profilePage" class="page">
                 <div class="profile-header">
                     <div class="profile-avatar">
@@ -1130,54 +985,6 @@
                                 <i class="fas fa-chevron-right"></i>
                             </div>
                         </a>
-                        <a href="#" class="menu-item">
-                            <div class="menu-icon">
-                                <i class="fas fa-user-shield"></i>
-                            </div>
-                            <div class="menu-text">
-                                <h3>Datos Personales</h3>
-                                <p>Gestiona tu información personal</p>
-                            </div>
-                            <div class="menu-arrow">
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                        </a>
-                        <a href="#" class="menu-item">
-                            <div class="menu-icon">
-                                <i class="fas fa-lock"></i>
-                            </div>
-                            <div class="menu-text">
-                                <h3>Seguridad</h3>
-                                <p>Cambia tu contraseña y PIN</p>
-                            </div>
-                            <div class="menu-arrow">
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                        </a>
-                        <a href="#" class="menu-item">
-                            <div class="menu-icon">
-                                <i class="fas fa-bell"></i>
-                            </div>
-                            <div class="menu-text">
-                                <h3>Notificaciones</h3>
-                                <p>Configura tus alertas</p>
-                            </div>
-                            <div class="menu-arrow">
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                        </a>
-                        <a href="#" class="menu-item">
-                            <div class="menu-icon">
-                                <i class="fas fa-question-circle"></i>
-                            </div>
-                            <div class="menu-text">
-                                <h3>Ayuda y Soporte</h3>
-                                <p>Centro de ayuda y contacto</p>
-                            </div>
-                            <div class="menu-arrow">
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                        </a>
                         <a href="#" class="menu-item" id="logoutBtn">
                             <div class="menu-icon">
                                 <i class="fas fa-sign-out-alt"></i>
@@ -1195,7 +1002,6 @@
             </section>
         </main>
 
-        <!-- Navegación Inferior -->
         <nav class="bottom-nav" style="display: none;" id="mainNav">
             <a href="#" class="nav-item active" data-page="homePage">
                 <i class="fas fa-home nav-icon"></i>
@@ -1217,91 +1023,9 @@
     </div>
 
     <script>
-        // =============================================
-        // FUNCIONES DE COMPATIBILIDAD PARA MÓVILES
-        // =============================================
-
-        // Detectar si es móvil
-        function isMobileDevice() {
-            return (typeof window.orientation !== "undefined") || 
-                   (navigator.userAgent.indexOf('IEMobile') !== -1) ||
-                   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-
-        // Función segura para localStorage
-        function safeLocalStorageGet(key) {
-            try {
-                return localStorage.getItem(key);
-            } catch (error) {
-                console.error('Error accediendo localStorage:', error);
-                return null;
-            }
-        }
-
-        function safeLocalStorageSet(key, value) {
-            try {
-                localStorage.setItem(key, value);
-                return true;
-            } catch (error) {
-                console.error('Error guardando en localStorage:', error);
-                return false;
-            }
-        }
-
-        // Función mejorada para compatibilidad móvil con archivos
-        function setupMobileFileInputs() {
-            if (isMobileDevice()) {
-                console.log('📱 Configurando inputs de archivo para móvil...');
-                
-                // Para móviles, mejorar la experiencia de selección de archivos
-                document.querySelectorAll('input[type="file"]').forEach(input => {
-                    // Remover cualquier atributo capture que fuerce la cámara
-                    input.removeAttribute('capture');
-                    
-                    // Mejorar el accept para móviles
-                    input.setAttribute('accept', 'image/*, application/pdf, .pdf, .jpg, .jpeg, .png');
-                    
-                    // Agregar atributos para mejor experiencia en iOS/Android
-                    input.setAttribute('multiple', 'false');
-                });
-                
-                // Mejorar los estilos para móviles
-                document.querySelectorAll('.file-upload').forEach(upload => {
-                    upload.style.minHeight = '120px';
-                    upload.style.display = 'flex';
-                    upload.style.flexDirection = 'column';
-                    upload.style.justifyContent = 'center';
-                    upload.style.alignItems = 'center';
-                    upload.style.padding = '1.5rem';
-                });
-            }
-        }
-
-        // Aplicar ajustes para móviles
-        function applyMobileFixes() {
-            if (isMobileDevice()) {
-                console.log('📱 Dispositivo móvil detectado, aplicando ajustes...');
-                
-                // Configurar inputs de archivo para móviles
-                setupMobileFileInputs();
-                
-                // Ajustar altura para navegadores móviles
-                const vh = window.innerHeight * 0.01;
-                document.documentElement.style.setProperty('--vh', `${vh}px`);
-                
-                // Prevenir zoom en formularios
-                document.querySelectorAll('input, select, textarea').forEach(element => {
-                    element.addEventListener('focus', function() {
-                        window.scrollTo(0, 0);
-                        document.body.scrollTop = 0;
-                    });
-                });
-            }
-        }
-
         // Sistema de Usuarios
         let currentUser = null;
-        let users = JSON.parse(safeLocalStorageGet('creditxpress_users')) || [];
+        let users = JSON.parse(localStorage.getItem('creditxpress_users')) || [];
 
         // DOM Elements
         const pages = document.querySelectorAll('.page');
@@ -1339,14 +1063,14 @@
         const logoutBtn = document.getElementById('logoutBtn');
 
         // =============================================
-        // NUEVAS FUNCIONES PARA MOSTRAR ESTADO DEL CRÉDITO
+        // FUNCIONES PRINCIPALES
         // =============================================
 
         // Función para cargar el estado del crédito del usuario
         function loadUserCreditStatus() {
             if (!currentUser) return;
 
-            const requests = JSON.parse(safeLocalStorageGet('creditxpress_requests')) || [];
+            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
             const userRequests = requests.filter(req => req.clientEmail === currentUser.email);
             
             const approvedRequest = userRequests.find(req => req.status === 'approved');
@@ -1365,13 +1089,11 @@
             document.getElementById('notificationCount').textContent = notificationCount;
 
             if (approvedRequest) {
-                // Usuario tiene un crédito aprobado
                 creditStatusSection.className = 'welcome-section approved';
                 statusMessage.innerHTML = `✅ <strong>¡Felicidades!</strong><br>Tu crédito ha sido aprobado`;
                 quickLoanBtn.textContent = 'Solicitar Otro Crédito';
                 quickLoanBtn.className = 'btn btn-success';
                 
-                // Mostrar información del crédito actual
                 currentCreditCard.style.display = 'block';
                 document.getElementById('currentCreditAmount').textContent = `$${approvedRequest.amount.toLocaleString()}`;
                 document.getElementById('currentCreditTerm').textContent = `${approvedRequest.term} meses`;
@@ -1379,21 +1101,18 @@
                 document.getElementById('currentCreditStatus').className = 'status-badge status-approved';
                 
             } else if (pendingRequest) {
-                // Usuario tiene una solicitud pendiente
                 creditStatusSection.className = 'welcome-section';
                 statusMessage.innerHTML = `⏳ <strong>Solicitud en revisión</strong><br>Estamos procesando tu solicitud #${pendingRequest.id}`;
                 quickLoanBtn.textContent = 'Ver Estado';
                 quickLoanBtn.className = 'btn btn-secondary';
                 
             } else if (rejectedRequest) {
-                // Usuario tiene una solicitud rechazada
                 creditStatusSection.className = 'welcome-section rejected';
                 statusMessage.innerHTML = `❌ <strong>Solicitud rechazada</strong><br>Tu solicitud #${rejectedRequest.id} no fue aprobada`;
                 quickLoanBtn.textContent = 'Nueva Solicitud';
                 quickLoanBtn.className = 'btn btn-primary';
                 
             } else {
-                // Usuario no tiene solicitudes
                 creditStatusSection.className = 'welcome-section';
                 statusMessage.textContent = 'Tu crédito preaprobado está listo';
                 quickLoanBtn.textContent = 'Solicitar $5,000';
@@ -1401,10 +1120,7 @@
                 currentCreditCard.style.display = 'none';
             }
             
-            // Cargar historial de transacciones
             loadTransactionHistory(userRequests);
-            
-            // Cargar lista de solicitudes
             loadUserRequests(userRequests);
         }
 
@@ -1413,10 +1129,8 @@
             const transactionsList = document.getElementById('transactionsList');
             transactionsList.innerHTML = '';
             
-            // Ordenar solicitudes por fecha (más reciente primero)
             userRequests.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             
-            // Mostrar las últimas 3 solicitudes como transacciones
             userRequests.slice(0, 3).forEach(request => {
                 const transactionItem = document.createElement('li');
                 transactionItem.className = 'transaction-item';
@@ -1452,7 +1166,6 @@
                 transactionsList.appendChild(transactionItem);
             });
             
-            // Si no hay solicitudes, mostrar mensaje
             if (userRequests.length === 0) {
                 transactionsList.innerHTML = `
                     <li class="transaction-item">
@@ -1482,7 +1195,6 @@
                 return;
             }
             
-            // Ordenar solicitudes por fecha (más reciente primero)
             userRequests.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             
             userRequests.forEach(request => {
@@ -1514,12 +1226,6 @@
                         ${new Date(request.timestamp).toLocaleDateString()} 
                         ${new Date(request.timestamp).toLocaleTimeString()}
                     </div>
-                    ${request.reviewedAt ? `
-                        <div style="color: var(--gray); font-size: 0.9rem; margin-top: 0.5rem;">
-                            <i class="fas fa-check-circle"></i> 
-                            Revisado: ${new Date(request.reviewedAt).toLocaleDateString()}
-                        </div>
-                    ` : ''}
                 `;
                 
                 userRequestsList.appendChild(requestCard);
@@ -1532,8 +1238,7 @@
                 'pending': 'Pendiente',
                 'under_review': 'En Revisión',
                 'approved': 'Aprobado',
-                'rejected': 'Rechazado',
-                'completed': 'Completado'
+                'rejected': 'Rechazado'
             };
             return statusMap[status] || status;
         }
@@ -1584,14 +1289,11 @@
             
             if (user) {
                 currentUser = user;
-                if (safeLocalStorageSet('creditxpress_current_user', JSON.stringify(user))) {
-                    showMainApp();
-                    alert('¡Bienvenido de nuevo!');
-                } else {
-                    alert('Error al guardar sesión. Intenta nuevamente.');
-                }
+                localStorage.setItem('creditxpress_current_user', JSON.stringify(user));
+                showMainApp();
+                alert('¡Bienvenido de nuevo!');
             } else {
-                alert('Credenciales incorrectas. Por favor verifica tu email y contraseña.');
+                alert('Credenciales incorrectas.');
             }
         });
 
@@ -1622,10 +1324,10 @@
             };
             
             users.push(newUser);
-            safeLocalStorageSet('creditxpress_users', JSON.stringify(users));
+            localStorage.setItem('creditxpress_users', JSON.stringify(users));
             
             currentUser = newUser;
-            safeLocalStorageSet('creditxpress_current_user', JSON.stringify(newUser));
+            localStorage.setItem('creditxpress_current_user', JSON.stringify(newUser));
             
             showMainApp();
             alert('¡Cuenta creada exitosamente!');
@@ -1635,28 +1337,17 @@
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             currentUser = null;
-            try {
-                localStorage.removeItem('creditxpress_current_user');
-            } catch (error) {
-                console.error('Error al cerrar sesión:', error);
-            }
+            localStorage.removeItem('creditxpress_current_user');
             showAuthPage();
             alert('Sesión cerrada correctamente.');
         });
 
         // Check if user is logged in on page load
         window.addEventListener('load', () => {
-            applyMobileFixes(); // Aplicar ajustes para móviles
-            
-            const savedUser = safeLocalStorageGet('creditxpress_current_user');
+            const savedUser = localStorage.getItem('creditxpress_current_user');
             if (savedUser) {
-                try {
-                    currentUser = JSON.parse(savedUser);
-                    showMainApp();
-                } catch (error) {
-                    console.error('Error parseando usuario:', error);
-                    showAuthPage();
-                }
+                currentUser = JSON.parse(savedUser);
+                showMainApp();
             } else {
                 showAuthPage();
             }
@@ -1725,7 +1416,7 @@
                 return;
             }
             
-            const requests = JSON.parse(safeLocalStorageGet('creditxpress_requests')) || [];
+            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
             const pendingRequest = requests.find(req => 
                 req.clientEmail === currentUser.email && req.status === 'pending'
             );
@@ -1746,7 +1437,6 @@
         // CALCULADORAS
         // =============================================
 
-        // Cálculo con Tasa Global (Interés Simple)
         function calculateLoan() {
             const amount = parseInt(loanAmountSlider.value);
             const term = parseInt(loanTermSlider.value);
@@ -1769,7 +1459,6 @@
             totalPayment.textContent = `$${Math.round(totalPaymentAmount).toLocaleString()}`;
         }
 
-        // Calculadora independiente con tabla de amortización
         function updateCalculator() {
             const amount = parseInt(calcAmount.value);
             const term = parseInt(calcTerm.value);
@@ -1786,7 +1475,6 @@
             generateAmortizationTable(amount, term, monthlyRate, monthlyPaymentAmount);
         }
 
-        // Generar tabla de amortización
         function generateAmortizationTable(amount, term, monthlyRate, monthlyPayment) {
             let balance = amount;
             let html = '';
@@ -1823,45 +1511,8 @@
         calcTerm.addEventListener('change', updateCalculator);
 
         // =============================================
-        // SISTEMA MEJORADO DE SUBIDA DE ARCHIVOS
+        // SISTEMA DE SUBIDA DE ARCHIVOS MEJORADO
         // =============================================
-
-        // Función para formatear tamaño de archivo
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // Función auxiliar para nombres de documentos
-        function getDocumentName(fileType) {
-            const names = {
-                'idFile': 'Identificación',
-                'addressFile': 'Comprobante de domicilio',
-                'creditFile': 'Buró de crédito',
-                'bankFile': 'Estado de cuenta'
-            };
-            return names[fileType] || fileType;
-        }
-
-        // Función para determinar tipo de archivo
-        function getFileType(file) {
-            if (!file) return 'unknown';
-            
-            if (file.type.includes('image')) {
-                return 'image';
-            } else if (file.type.includes('pdf')) {
-                return 'pdf';
-            } else if (file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-                return 'image';
-            } else if (file.name.match(/\.pdf$/i)) {
-                return 'pdf';
-            } else {
-                return 'document';
-            }
-        }
 
         // Configurar sistema de subida de archivos
         const fileUploads = [
@@ -1917,58 +1568,42 @@
                     uploadElement.classList.add('upload-success');
                 }
             });
-            
-            uploadElement.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadElement.style.borderColor = 'var(--secondary)';
-                uploadElement.style.backgroundColor = '#f0f8ff';
-            });
-            
-            uploadElement.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                if (!uploadElement.classList.contains('upload-success')) {
-                    uploadElement.style.borderColor = 'var(--border)';
-                    uploadElement.style.backgroundColor = '';
-                }
-            });
-            
-            uploadElement.addEventListener('drop', (e) => {
-                e.preventDefault();
-                if (e.dataTransfer.files.length > 0) {
-                    fileInput.files = e.dataTransfer.files;
-                    const event = new Event('change', { bubbles: true });
-                    fileInput.dispatchEvent(event);
-                }
-            });
         });
 
-        // =============================================
-        // FUNCIÓN MEJORADA: GUARDAR ARCHIVOS COMO BASE64
-        // =============================================
+        // Función para formatear tamaño de archivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Función para determinar tipo de archivo
+        function getFileType(file) {
+            if (!file) return 'unknown';
+            
+            if (file.type.includes('image')) {
+                return 'image';
+            } else if (file.type.includes('pdf')) {
+                return 'pdf';
+            } else if (file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                return 'image';
+            } else if (file.name.match(/\.pdf$/i)) {
+                return 'pdf';
+            } else {
+                return 'document';
+            }
+        }
+
+        // Función para guardar archivos como Base64
         function saveCreditRequest(amount, term, files) {
-            const requests = JSON.parse(safeLocalStorageGet('creditxpress_requests')) || [];
+            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
             
             function fileToBase64(file) {
                 return new Promise((resolve, reject) => {
                     if (!file) {
                         reject(new Error('Archivo no válido'));
-                        return;
-                    }
-
-                    const maxSize = 10 * 1024 * 1024;
-                    if (file.size > maxSize) {
-                        reject(new Error(`El archivo ${file.name} es demasiado grande. Máximo 10MB.`));
-                        return;
-                    }
-
-                    const allowedTypes = [
-                        'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
-                        'application/pdf', 'image/webp'
-                    ];
-                    
-                    if (!allowedTypes.includes(file.type) && 
-                        !file.name.match(/\.(jpg|jpeg|png|gif|pdf|webp)$/i)) {
-                        reject(new Error(`Tipo de archivo no permitido: ${file.name}. Solo JPG, PNG, GIF, PDF.`));
                         return;
                     }
 
@@ -1983,12 +1618,7 @@
                     };
                     
                     reader.onerror = (error) => {
-                        console.error('Error en FileReader:', error);
                         reject(new Error(`Error al leer el archivo: ${file.name}`));
-                    };
-                    
-                    reader.onabort = () => {
-                        reject(new Error('Lectura del archivo cancelada'));
                     };
                     
                     try {
@@ -1999,7 +1629,7 @@
                 });
             }
 
-            alert('📤 Procesando documentos... Por favor espera.');
+            alert('📤 Procesando documentos...');
 
             const processFiles = async () => {
                 try {
@@ -2014,7 +1644,7 @@
                                 console.log(`✅ ${fileType} procesado correctamente`);
                             } catch (error) {
                                 console.error(`❌ Error en ${fileType}:`, error);
-                                throw new Error(`Error en ${getDocumentName(fileType)}: ${error.message}`);
+                                throw new Error(`Error en documento: ${error.message}`);
                             }
                         }
                     }
@@ -2064,11 +1694,11 @@
                     };
                     
                     requests.push(newRequest);
-                    safeLocalStorageSet('creditxpress_requests', JSON.stringify(requests));
+                    localStorage.setItem('creditxpress_requests', JSON.stringify(requests));
                     
-                    console.log('✅ Solicitud guardada exitosamente:', newRequest);
+                    console.log('✅ Solicitud guardada exitosamente');
                     
-                    showSuccessMessage(newRequest.id, documents);
+                    alert(`✅ ¡Solicitud #${newRequest.id} enviada exitosamente!\n\nTu solicitud será revisada pronto.`);
                     
                     resetFileUploads();
                     
@@ -2076,32 +1706,12 @@
                     showPage('homePage');
                     
                 } catch (error) {
-                    console.error('❌ Error general al procesar archivos:', error);
-                    alert(`❌ Error al procesar documentos:\n\n${error.message}\n\nPor favor intenta nuevamente con archivos más pequeños o en formato diferente.`);
+                    console.error('❌ Error al procesar archivos:', error);
+                    alert(`❌ Error al procesar documentos:\n\n${error.message}`);
                 }
             };
 
             processFiles();
-        }
-
-        // Función para mostrar mensaje de éxito
-        function showSuccessMessage(requestId, documents) {
-            let message = `✅ ¡Solicitud #${requestId} enviada exitosamente!\n\n`;
-            message += `📋 Documentos procesados:\n`;
-            
-            Object.entries(documents).forEach(([docType, docData]) => {
-                const docName = getDocumentName(docType + 'File');
-                const fileSize = formatFileSize(docData.size);
-                message += `• ${docName}: ${docData.name} (${fileSize})\n`;
-            });
-            
-            message += `\n📊 Resumen del crédito:\n`;
-            message += `• Monto: $${parseInt(document.getElementById('loanAmount').value).toLocaleString()}\n`;
-            message += `• Plazo: ${document.getElementById('loanTerm').value} meses\n`;
-            message += `• Cuota mensual: ${document.getElementById('monthlyPayment').textContent}\n\n`;
-            message += `⏳ Tu solicitud será revisada pronto.`;
-            
-            alert(message);
         }
 
         // Función para limpiar los uploads
@@ -2125,7 +1735,7 @@
         }
 
         // =============================================
-        // BOTÓN MEJORADO: PROCESAR ARCHIVOS
+        // BOTÓN PARA PROCESAR ARCHIVOS
         // =============================================
         submitDocumentsBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -2143,17 +1753,6 @@
             
             if (!idFile || !addressFile || !creditFile || !bankFile) {
                 alert('❌ Por favor sube TODOS los documentos requeridos.');
-                
-                fileUploads.forEach(upload => {
-                    const fileInput = document.getElementById(upload.fileInput);
-                    const uploadElement = document.getElementById(upload.id);
-                    
-                    if (!fileInput.files[0]) {
-                        uploadElement.style.borderColor = 'var(--accent)';
-                        uploadElement.style.backgroundColor = '#fff5f5';
-                    }
-                });
-                
                 return;
             }
             
@@ -2177,45 +1776,6 @@
             calculateLoan();
             showPage('loanPage');
         });
-
-        // Función de diagnóstico para verificar los datos guardados
-        function debugStorage() {
-            console.log("=== DIAGNÓSTICO DEL ALMACENAMIENTO ===");
-            
-            // Verificar usuarios
-            const users = JSON.parse(localStorage.getItem('creditxpress_users')) || [];
-            console.log(`Usuarios registrados: ${users.length}`);
-            
-            // Verificar solicitudes
-            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
-            console.log(`Solicitudes totales: ${requests.length}`);
-            
-            requests.forEach((request, index) => {
-                console.log(`Solicitud #${request.id}:`, {
-                    cliente: request.clientName,
-                    estado: request.status,
-                    documentos: request.documents ? Object.keys(request.documents) : 'Sin documentos'
-                });
-                
-                if (request.documents) {
-                    Object.entries(request.documents).forEach(([docType, docData]) => {
-                        const hasData = !!(docData && docData.data);
-                        console.log(`  📄 ${docType}:`, {
-                            tieneDatos: hasData,
-                            tipo: docData ? docData.type : 'N/A',
-                            tamaño: docData ? docData.size : 'N/A'
-                        });
-                    });
-                }
-            });
-        }
-
-        // Ajustar para cambios de orientación en móviles
-        window.addEventListener('orientationchange', function() {
-            setTimeout(applyMobileFixes, 100);
-        });
-
-        window.addEventListener('resize', applyMobileFixes);
     </script>
 </body>
 </html>
