@@ -763,6 +763,28 @@
         .file-upload.error .error-message {
             display: block;
         }
+
+        /* Estados de carga mejorados */
+        .file-upload.uploading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .file-upload.uploading::after {
+            content: '📤 Subiendo...';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -976,7 +998,7 @@
                         <div class="file-upload" id="idUpload">
                             <i class="fas fa-id-card"></i>
                             <p>Haz clic para subir tu identificación</p>
-                            <input type="file" id="idFile" accept="image/*, application/pdf" capture="environment">
+                            <input type="file" id="idFile" accept="image/*, application/pdf">
                             <div class="file-name" id="idFileName">No se ha seleccionado archivo</div>
                             <div class="error-message" id="idFileError"></div>
                         </div>
@@ -987,7 +1009,7 @@
                         <div class="file-upload" id="addressUpload">
                             <i class="fas fa-home"></i>
                             <p>Haz clic para subir comprobante de domicilio</p>
-                            <input type="file" id="addressFile" accept="image/*, application/pdf" capture="environment">
+                            <input type="file" id="addressFile" accept="image/*, application/pdf">
                             <div class="file-name" id="addressFileName">No se ha seleccionado archivo</div>
                             <div class="error-message" id="addressFileError"></div>
                         </div>
@@ -998,7 +1020,7 @@
                         <div class="file-upload" id="creditUpload">
                             <i class="fas fa-chart-line"></i>
                             <p>Haz clic para subir reporte de buró de crédito</p>
-                            <input type="file" id="creditFile" accept="image/*, application/pdf" capture="environment">
+                            <input type="file" id="creditFile" accept="image/*, application/pdf">
                             <div class="file-name" id="creditFileName">No se ha seleccionado archivo</div>
                             <div class="error-message" id="creditFileError"></div>
                         </div>
@@ -1009,7 +1031,7 @@
                         <div class="file-upload" id="bankUpload">
                             <i class="fas fa-university"></i>
                             <p>Haz clic para subir estado de cuenta</p>
-                            <input type="file" id="bankFile" accept="image/*, application/pdf" capture="environment">
+                            <input type="file" id="bankFile" accept="image/*, application/pdf">
                             <div class="file-name" id="bankFileName">No se ha seleccionado archivo</div>
                             <div class="error-message" id="bankFileError"></div>
                         </div>
@@ -1226,15 +1248,42 @@
             }
         }
 
+        // Función mejorada para compatibilidad móvil con archivos
+        function setupMobileFileInputs() {
+            if (isMobileDevice()) {
+                console.log('📱 Configurando inputs de archivo para móvil...');
+                
+                // Para móviles, mejorar la experiencia de selección de archivos
+                document.querySelectorAll('input[type="file"]').forEach(input => {
+                    // Remover cualquier atributo capture que fuerce la cámara
+                    input.removeAttribute('capture');
+                    
+                    // Mejorar el accept para móviles
+                    input.setAttribute('accept', 'image/*, application/pdf, .pdf, .jpg, .jpeg, .png');
+                    
+                    // Agregar atributos para mejor experiencia en iOS/Android
+                    input.setAttribute('multiple', 'false');
+                });
+                
+                // Mejorar los estilos para móviles
+                document.querySelectorAll('.file-upload').forEach(upload => {
+                    upload.style.minHeight = '120px';
+                    upload.style.display = 'flex';
+                    upload.style.flexDirection = 'column';
+                    upload.style.justifyContent = 'center';
+                    upload.style.alignItems = 'center';
+                    upload.style.padding = '1.5rem';
+                });
+            }
+        }
+
         // Aplicar ajustes para móviles
         function applyMobileFixes() {
             if (isMobileDevice()) {
                 console.log('📱 Dispositivo móvil detectado, aplicando ajustes...');
                 
-                // Mejorar file inputs para móviles
-                document.querySelectorAll('input[type="file"]').forEach(input => {
-                    input.setAttribute('accept', 'image/*, application/pdf');
-                });
+                // Configurar inputs de archivo para móviles
+                setupMobileFileInputs();
                 
                 // Ajustar altura para navegadores móviles
                 const vh = window.innerHeight * 0.01;
@@ -2128,6 +2177,38 @@
             calculateLoan();
             showPage('loanPage');
         });
+
+        // Función de diagnóstico para verificar los datos guardados
+        function debugStorage() {
+            console.log("=== DIAGNÓSTICO DEL ALMACENAMIENTO ===");
+            
+            // Verificar usuarios
+            const users = JSON.parse(localStorage.getItem('creditxpress_users')) || [];
+            console.log(`Usuarios registrados: ${users.length}`);
+            
+            // Verificar solicitudes
+            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+            console.log(`Solicitudes totales: ${requests.length}`);
+            
+            requests.forEach((request, index) => {
+                console.log(`Solicitud #${request.id}:`, {
+                    cliente: request.clientName,
+                    estado: request.status,
+                    documentos: request.documents ? Object.keys(request.documents) : 'Sin documentos'
+                });
+                
+                if (request.documents) {
+                    Object.entries(request.documents).forEach(([docType, docData]) => {
+                        const hasData = !!(docData && docData.data);
+                        console.log(`  📄 ${docType}:`, {
+                            tieneDatos: hasData,
+                            tipo: docData ? docData.type : 'N/A',
+                            tamaño: docData ? docData.size : 'N/A'
+                        });
+                    });
+                }
+            });
+        }
 
         // Ajustar para cambios de orientación en móviles
         window.addEventListener('orientationchange', function() {
