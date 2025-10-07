@@ -6,7 +6,6 @@
     <title>CreditXpress CRM - Panel de Administración</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* [MANTÉN TODOS LOS ESTILOS ORIGINALES DEL CRM] */
         :root {
             --primary: #1a5276;
             --secondary: #3498db;
@@ -40,6 +39,7 @@
             padding: 20px;
         }
         
+        /* Header CRM */
         .crm-header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
@@ -84,6 +84,7 @@
             justify-content: center;
         }
         
+        /* Dashboard */
         .dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -122,6 +123,7 @@
             font-size: 0.9rem;
         }
         
+        /* Filtros */
         .filters {
             background: white;
             padding: 1.5rem;
@@ -153,6 +155,7 @@
             background: white;
         }
         
+        /* Tabla de Solicitudes */
         .requests-table {
             background: white;
             border-radius: 10px;
@@ -238,6 +241,7 @@
             color: white;
         }
         
+        /* Modal de Detalles */
         .modal {
             display: none;
             position: fixed;
@@ -353,30 +357,7 @@
             margin-top: 0.3rem;
         }
         
-        /* Nuevos estilos para sincronización */
-        .sync-section {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 2rem;
-        }
-        
-        .sync-buttons {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
-        
-        .sync-info {
-            background: var(--light);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-        }
-        
+        /* Responsive */
         @media (max-width: 768px) {
             .filters {
                 flex-direction: column;
@@ -399,14 +380,11 @@
             .document-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .sync-buttons {
-                flex-direction: column;
-            }
         }
     </style>
 </head>
 <body>
+    <!-- Header CRM -->
     <header class="crm-header">
         <div class="container">
             <div class="header-content">
@@ -428,35 +406,6 @@
     </header>
 
     <div class="container">
-        <!-- Sección de Sincronización -->
-        <div class="sync-section">
-            <h3>🔄 Sincronización entre Dispositivos</h3>
-            <p style="color: var(--gray); margin-bottom: 1rem;">Exporta e importa datos entre tu computadora y celular</p>
-            
-            <div class="sync-buttons">
-                <button class="action-btn btn-view" onclick="exportData()">
-                    <i class="fas fa-download"></i> Exportar Datos
-                </button>
-                <button class="action-btn btn-approve" onclick="importData()">
-                    <i class="fas fa-upload"></i> Importar Datos
-                </button>
-                <button class="action-btn" onclick="showStorageStatus()" style="background: var(--primary); color: white;">
-                    <i class="fas fa-info-circle"></i> Ver Estado
-                </button>
-                <button class="action-btn" onclick="clearAllData()" style="background: var(--accent); color: white;">
-                    <i class="fas fa-trash"></i> Limpiar Todo
-                </button>
-            </div>
-            
-            <div class="sync-info">
-                <strong>📋 Instrucciones:</strong><br>
-                1. En la computadora: Haz clic en "Exportar Datos" y guarda el archivo .json<br>
-                2. En el celular: Ve al CRM y haz clic en "Importar Datos"<br>
-                3. Selecciona el archivo .json que descargaste<br>
-                4. ¡Listo! Los datos estarán sincronizados
-            </div>
-        </div>
-
         <!-- Dashboard de Estadísticas -->
         <div class="dashboard">
             <div class="stat-card">
@@ -568,114 +517,11 @@
     </div>
 
     <script>
-        // =============================================
-        // SISTEMA DE SINCRONIZACIÓN
-        // =============================================
-
-        function exportData() {
-            const users = JSON.parse(localStorage.getItem('creditxpress_users')) || [];
-            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
-            
-            const data = {
-                users: users,
-                requests: requests,
-                exportDate: new Date().toISOString(),
-                totalUsers: users.length,
-                totalRequests: requests.length
-            };
-            
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(dataBlob);
-            link.download = `creditxpress_backup_${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-            
-            alert(`✅ Datos exportados correctamente!\n\n📊 Resumen:\n• ${users.length} usuarios\n• ${requests.length} solicitudes\n\n💾 Guarda el archivo .json y súbelo en el otro dispositivo.`);
-        }
-
-        function importData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    try {
-                        const data = JSON.parse(event.target.result);
-                        
-                        if (data.users && data.requests) {
-                            if (confirm(`¿Importar ${data.users.length} usuarios y ${data.requests.length} solicitudes?\n\nEsto reemplazará todos los datos actuales.`)) {
-                                localStorage.setItem('creditxpress_users', JSON.stringify(data.users));
-                                localStorage.setItem('creditxpress_requests', JSON.stringify(data.requests));
-                                
-                                alert(`✅ Datos importados correctamente!\n\n📊 Datos importados:\n• ${data.users.length} usuarios\n• ${data.requests.length} solicitudes\n• Exportado: ${new Date(data.exportDate).toLocaleDateString()}`);
-                                
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 1500);
-                            }
-                        } else {
-                            alert('❌ El archivo no contiene datos válidos de CreditXpress.');
-                        }
-                    } catch (error) {
-                        alert('❌ Error al importar datos: ' + error.message);
-                    }
-                };
-                
-                reader.readAsText(file);
-            };
-            
-            input.click();
-        }
-
-        function showStorageStatus() {
-            const users = JSON.parse(localStorage.getItem('creditxpress_users')) || [];
-            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
-            
-            let statusMessage = `💾 Estado del Almacenamiento Local:\n\n`;
-            statusMessage += `👥 Usuarios registrados: ${users.length}\n`;
-            statusMessage += `📋 Solicitudes de crédito: ${requests.length}\n\n`;
-            
-            // Estadísticas de solicitudes
-            const pending = requests.filter(req => req.status === 'pending').length;
-            const approved = requests.filter(req => req.status === 'approved').length;
-            const rejected = requests.filter(req => req.status === 'rejected').length;
-            
-            statusMessage += `📊 Estado de solicitudes:\n`;
-            statusMessage += `• ⏳ Pendientes: ${pending}\n`;
-            statusMessage += `• ✅ Aprobadas: ${approved}\n`;
-            statusMessage += `• ❌ Rechazadas: ${rejected}\n\n`;
-            statusMessage += `💡 Usa "Exportar/Importar" para sincronizar entre dispositivos.`;
-            
-            alert(statusMessage);
-        }
-
-        function clearAllData() {
-            if (confirm('⚠️ ¿ESTÁS SEGURO DE QUE QUIERES ELIMINAR TODOS LOS DATOS?\n\nEsta acción no se puede deshacer y eliminará:\n• Todos los usuarios\n• Todas las solicitudes\n• Toda la información del sistema')) {
-                localStorage.removeItem('creditxpress_users');
-                localStorage.removeItem('creditxpress_requests');
-                localStorage.removeItem('creditxpress_current_user');
-                
-                alert('🗑️ Todos los datos han sido eliminados.');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            }
-        }
-
-        // =============================================
-        // CÓDigo ORIGINAL DEL CRM (mantener todo esto)
-        // =============================================
-        
+        // Base de datos simulada para el CRM
         let creditRequests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
         let currentRequestId = null;
 
+        // Cargar estadísticas
         function loadStatistics() {
             const total = creditRequests.length;
             const pending = creditRequests.filter(req => req.status === 'pending').length;
@@ -688,6 +534,7 @@
             document.getElementById('rejectedRequests').textContent = rejected;
         }
 
+        // Cargar solicitudes en la tabla
         function loadRequests() {
             const tbody = document.getElementById('requestsTableBody');
             const statusFilter = document.getElementById('statusFilter').value;
@@ -696,6 +543,7 @@
 
             let filteredRequests = creditRequests;
 
+            // Aplicar filtros
             if (statusFilter !== 'all') {
                 filteredRequests = filteredRequests.filter(req => req.status === statusFilter);
             }
@@ -727,6 +575,7 @@
                 });
             }
 
+            // Ordenar por fecha (más reciente primero)
             filteredRequests.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
             tbody.innerHTML = '';
@@ -768,14 +617,314 @@
             });
         }
 
-        // ... (mantén todas las otras funciones originales del CRM)
+        // Función CORREGIDA para cargar documentos en el modal
+        function loadDocumentsToModal(request) {
+            const documentGrid = document.getElementById('documentGrid');
+            documentGrid.innerHTML = '';
+
+            const documents = [
+                { type: 'identification', label: 'Identificación', icon: 'fa-id-card' },
+                { type: 'address', label: 'Comprobante Domicilio', icon: 'fa-home' },
+                { type: 'credit', label: 'Buró de Crédito', icon: 'fa-chart-line' },
+                { type: 'bank', label: 'Estado Bancario', icon: 'fa-university' }
+            ];
+
+            documents.forEach(doc => {
+                const docData = request.documents[doc.type];
+                
+                // VERIFICACIÓN MEJORADA - Asegurar que existe docData y tiene datos Base64
+                const hasDocument = docData && docData.data && 
+                                   (docData.data.startsWith('data:image/') || 
+                                    docData.data.startsWith('data:application/pdf') ||
+                                    docData.data.startsWith('data:application/'));
+                
+                const docCard = document.createElement('div');
+                docCard.className = `document-card ${hasDocument ? 'has-document' : 'no-document'}`;
+                
+                if (hasDocument) {
+                    docCard.onclick = () => viewDocument(docData, doc.label);
+                }
+                
+                // Formatear tamaño del archivo
+                const fileSize = hasDocument ? formatFileSize(docData.size) : 'N/A';
+                
+                docCard.innerHTML = `
+                    <div class="document-icon">
+                        <i class="fas ${doc.icon}"></i>
+                    </div>
+                    <div>${doc.label}</div>
+                    <div style="font-size: 0.8rem; margin-top: 0.5rem; 
+                        color: ${hasDocument ? 'var(--success)' : 'var(--accent)'}; 
+                        font-weight: ${hasDocument ? '600' : '400'}">
+                        ${hasDocument ? '✅ Documento listo' : '❌ Sin documento'}
+                    </div>
+                    ${hasDocument ? `
+                        <div style="font-size: 0.7rem; color: var(--gray); margin-top: 0.3rem;">
+                            ${docData.name}
+                        </div>
+                        <div class="file-size">
+                            ${fileSize}
+                        </div>
+                    ` : ''}
+                `;
+                
+                documentGrid.appendChild(docCard);
+            });
+        }
+
+        // Formatear tamaño de archivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Ver detalles de una solicitud
+        function viewRequest(requestId) {
+            const request = creditRequests.find(req => req.id === requestId);
+            if (!request) {
+                alert('Solicitud no encontrada');
+                return;
+            }
+
+            currentRequestId = requestId;
+            document.getElementById('modalRequestId').textContent = requestId;
+
+            // Cargar documentos en el modal
+            loadDocumentsToModal(request);
+
+            document.getElementById('requestModal').style.display = 'flex';
+        }
+
+        // Función MEJORADA para ver documentos CON BASE64
+        function viewDocument(documentData, documentName) {
+            const viewer = document.getElementById('documentViewer');
+            
+            if (documentData && documentData.data) {
+                // Verificar que el Base64 sea válido
+                if (!documentData.data.startsWith('data:')) {
+                    viewer.innerHTML = `
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                        <h4>Error en formato de documento</h4>
+                        <p>El documento no está en formato Base64 válido</p>
+                    `;
+                    return;
+                }
+                
+                if (documentData.type === 'image' || 
+                    documentData.name.includes('.jpg') || 
+                    documentData.name.includes('.png') || 
+                    documentData.name.includes('.jpeg') ||
+                    documentData.data.startsWith('data:image/')) {
+                    
+                    viewer.innerHTML = `
+                        <h4>${documentName}</h4>
+                        <img src="${documentData.data}" alt="${documentName}" style="max-width: 100%; max-height: 400px; border-radius: 5px;">
+                        <div class="document-actions">
+                            <button class="action-btn btn-view" onclick="downloadBase64Document('${documentData.data}', '${documentData.name}')">
+                                <i class="fas fa-download"></i> Descargar Imagen
+                            </button>
+                            <button class="action-btn btn-secondary" onclick="openBase64Document('${documentData.data}')">
+                                <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
+                            </button>
+                        </div>
+                    `;
+                } else if (documentData.type === 'pdf' || 
+                           documentData.name.includes('.pdf') ||
+                           documentData.data.startsWith('data:application/pdf')) {
+                    // Para PDFs
+                    viewer.innerHTML = `
+                        <h4>${documentName}</h4>
+                        <div style="padding: 2rem; text-align: center;">
+                            <i class="fas fa-file-pdf" style="font-size: 4rem; color: var(--accent);"></i>
+                            <p style="margin-top: 1rem;">${documentData.name}</p>
+                            <p style="color: var(--gray); font-size: 0.9rem;">Tipo: ${documentData.type}</p>
+                            <p style="color: var(--gray); font-size: 0.9rem;">Tamaño: ${formatFileSize(documentData.size)}</p>
+                            <div class="document-actions">
+                                <button class="action-btn btn-view" onclick="downloadBase64Document('${documentData.data}', '${documentData.name}')">
+                                    <i class="fas fa-download"></i> Descargar PDF
+                                </button>
+                                <button class="action-btn btn-secondary" onclick="openBase64Document('${documentData.data}')">
+                                    <i class="fas fa-external-link-alt"></i> Abrir PDF
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Para otros tipos de documentos
+                    viewer.innerHTML = `
+                        <h4>${documentName}</h4>
+                        <div style="padding: 2rem; text-align: center;">
+                            <i class="fas fa-file" style="font-size: 4rem; color: var(--secondary);"></i>
+                            <p style="margin-top: 1rem;">${documentData.name}</p>
+                            <p style="color: var(--gray); font-size: 0.9rem;">Tipo: ${documentData.type}</p>
+                            <p style="color: var(--gray); font-size: 0.9rem;">Tamaño: ${formatFileSize(documentData.size)}</p>
+                            <div class="document-actions">
+                                <button class="action-btn btn-view" onclick="downloadBase64Document('${documentData.data}', '${documentData.name}')">
+                                    <i class="fas fa-download"></i> Descargar
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                viewer.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                    <h4>Documento no disponible</h4>
+                    <p>El documento no se pudo cargar correctamente</p>
+                `;
+            }
+        }
+
+        // Descargar documento Base64
+        function downloadBase64Document(base64Data, filename) {
+            try {
+                // Crear link de descarga
+                const link = document.createElement('a');
+                link.href = base64Data;
+                link.download = filename;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                setTimeout(() => {
+                    alert(`✅ Documento "${filename}" descargado correctamente`);
+                }, 500);
+                
+            } catch (error) {
+                console.error('Error al descargar:', error);
+                alert('❌ Error al descargar el documento. Intenta abrirlo en nueva pestaña.');
+            }
+        }
+
+        // Abrir documento Base64 en nueva pestaña
+        function openBase64Document(base64Data) {
+            try {
+                const newWindow = window.open();
+                newWindow.document.write(`
+                    <html>
+                        <head><title>Documento</title></head>
+                        <body style="margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+                            <img src="${base64Data}" style="max-width: 100%; max-height: 90vh;" onerror="this.style.display='none'; document.getElementById('pdfViewer').style.display='block';">
+                            <embed id="pdfViewer" src="${base64Data}" type="application/pdf" width="100%" height="600px" style="display:none;">
+                            <div style="position: fixed; top: 20px; right: 20px;">
+                                <button onclick="window.print()" style="padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                    🖨️ Imprimir
+                                </button>
+                                <button onclick="window.close()" style="padding: 10px 15px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
+                                    ❌ Cerrar
+                                </button>
+                            </div>
+                        </body>
+                    </html>
+                `);
+            } catch (error) {
+                console.error('Error al abrir documento:', error);
+                alert('❌ Error al abrir el documento. Intenta descargarlo.');
+            }
+        }
+
+        // Actualizar estado de solicitud
+        function updateRequestStatus(newStatus) {
+            if (!currentRequestId) return;
+
+            const requestIndex = creditRequests.findIndex(req => req.id === currentRequestId);
+            if (requestIndex !== -1) {
+                creditRequests[requestIndex].status = newStatus;
+                creditRequests[requestIndex].reviewedAt = new Date().toISOString();
+                localStorage.setItem('creditxpress_requests', JSON.stringify(creditRequests));
+                
+                loadStatistics();
+                loadRequests();
+                closeModal();
+                
+                alert(`Solicitud ${newStatus === 'approved' ? 'aprobada' : 'rechazada'} correctamente.`);
+            }
+        }
+
+        // Aprobación rápida
+        function quickApprove(requestId) {
+            if (confirm('¿Estás seguro de que quieres aprobar esta solicitud?')) {
+                currentRequestId = requestId;
+                updateRequestStatus('approved');
+            }
+        }
+
+        // Rechazo rápido
+        function quickReject(requestId) {
+            if (confirm('¿Estás seguro de que quieres rechazar esta solicitud?')) {
+                currentRequestId = requestId;
+                updateRequestStatus('rejected');
+            }
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById('requestModal').style.display = 'none';
+            currentRequestId = null;
+            
+            // Limpiar visor de documentos
+            document.getElementById('documentViewer').innerHTML = `
+                <i class="fas fa-file-alt" style="font-size: 3rem; color: var(--gray); margin-bottom: 1rem;"></i>
+                <p>Selecciona un documento para verlo</p>
+            `;
+        }
+
+        // Texto del estado
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'Pendiente',
+                'under_review': 'En Revisión',
+                'approved': 'Aprobado',
+                'rejected': 'Rechazado',
+                'completed': 'Completado'
+            };
+            return statusMap[status] || status;
+        }
+
+        // Función de diagnóstico para verificar los datos guardados
+        function debugRequests() {
+            console.log("=== DIAGNÓSTICO DE SOLICITUDES ===");
+            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+            
+            requests.forEach((request, index) => {
+                console.log(`Solicitud #${request.id}:`, {
+                    cliente: request.clientName,
+                    monto: request.amount,
+                    estado: request.status,
+                    documentos: request.documents ? Object.keys(request.documents) : 'Sin documentos'
+                });
+                
+                if (request.documents) {
+                    Object.entries(request.documents).forEach(([docType, docData]) => {
+                        console.log(`  ${docType}:`, {
+                            tieneDatos: !!(docData && docData.data),
+                            tipoBase64: docData && docData.data ? docData.data.substring(0, 50) + '...' : 'No hay datos',
+                            tamaño: docData ? docData.size : 'N/A'
+                        });
+                    });
+                }
+            });
+        }
 
         // Inicializar
         window.addEventListener('load', () => {
             loadStatistics();
             loadRequests();
+            
+            // Para diagnóstico, puedes descomentar la siguiente línea:
+            // debugRequests();
         });
 
+        // Cerrar modal al hacer clic fuera
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('requestModal')) {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html>
