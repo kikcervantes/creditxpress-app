@@ -596,77 +596,6 @@
             display: block;
         }
 
-        .validation-report {
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 1rem;
-            margin: 1rem 0;
-            background: white;
-        }
-        .validation-header.valid {
-            background: #e8f5e8;
-            border-left: 4px solid #27ae60;
-        }
-        .validation-header.invalid {
-            background: #fdeaea;
-            border-left: 4px solid #e74c3c;
-        }
-        .validation-header {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-        .validation-score {
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        .validation-category {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        .category-status.passed {
-            color: #27ae60;
-        }
-        .category-status.failed {
-            color: #e74c3c;
-        }
-        .validation-elements {
-            list-style: none;
-            padding: 0;
-        }
-        .validation-element {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .validation-element.passed {
-            color: #27ae60;
-        }
-        .validation-element.failed {
-            color: #e74c3c;
-        }
-        .element-status {
-            margin-right: 0.5rem;
-            font-weight: bold;
-        }
-        .element-name {
-            flex: 1;
-        }
-        .element-value, .element-confidence {
-            font-size: 0.8rem;
-            color: #7f8c8d;
-            margin-left: 0.5rem;
-        }
-        .recommendations {
-            background: #fff3cd;
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 4px solid #f39c12;
-        }
-
         @media (max-width: 380px) {
             .quick-actions {
                 grid-template-columns: 1fr;
@@ -1043,7 +972,7 @@
     </div>
 
     <script>
-        // Sistema de Usuarios - CORREGIDO
+        // Sistema de Usuarios
         let currentUser = null;
         let users = JSON.parse(localStorage.getItem('creditxpress_users')) || [];
 
@@ -1083,7 +1012,7 @@
         const logoutBtn = document.getElementById('logoutBtn');
 
         // =============================================
-        // FUNCIONES PRINCIPALES - CORREGIDAS
+        // FUNCIONES PRINCIPALES
         // =============================================
 
         // Función para cargar el estado del crédito del usuario
@@ -1264,7 +1193,7 @@
         }
 
         // =============================================
-        // SISTEMA DE AUTENTICACIÓN - CORREGIDO
+        // SISTEMA DE AUTENTICACIÓN
         // =============================================
 
         function showAuthPage() {
@@ -1300,7 +1229,7 @@
             });
         });
 
-        // Login - CORREGIDO
+        // Login
         loginBtn.addEventListener('click', () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -1322,7 +1251,7 @@
             }
         });
 
-        // Register - CORREGIDO
+        // Register
         registerBtn.addEventListener('click', () => {
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
@@ -1364,7 +1293,7 @@
             alert('¡Cuenta creada exitosamente!');
         });
 
-        // Logout - CORREGIDO
+        // Logout
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             currentUser = null;
@@ -1373,7 +1302,7 @@
             alert('Sesión cerrada correctamente.');
         });
 
-        // Check if user is logged in on page load - CORREGIDO
+        // Check if user is logged in on page load
         window.addEventListener('load', () => {
             const savedUser = localStorage.getItem('creditxpress_current_user');
             if (savedUser) {
@@ -1390,7 +1319,7 @@
         });
 
         // =============================================
-        // SISTEMA DE NAVEGACIÓN - CORREGIDO
+        // SISTEMA DE NAVEGACIÓN
         // =============================================
 
         function showPage(pageId) {
@@ -1415,7 +1344,7 @@
             }
         }
 
-        // Configurar event listeners para navegación - CORREGIDO
+        // Configurar event listeners para navegación
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -1443,7 +1372,7 @@
         });
 
         // =============================================
-        // BOTONES DE ACCIÓN - CORREGIDOS
+        // BOTONES DE ACCIÓN
         // =============================================
 
         quickLoanBtn.addEventListener('click', (e) => {
@@ -1471,7 +1400,7 @@
         });
 
         // =============================================
-        // CALCULADORAS - CORREGIDAS
+        // CALCULADORAS
         // =============================================
 
         function calculateLoan() {
@@ -1548,7 +1477,7 @@
         calcTerm.addEventListener('change', updateCalculator);
 
         // =============================================
-        // SISTEMA DE SUBIDA DE ARCHIVOS - CORREGIDO
+        // SISTEMA DE SUBIDA DE ARCHIVOS
         // =============================================
 
         // Configurar sistema de subida de archivos
@@ -1774,7 +1703,7 @@
         }
 
         // =============================================
-        // BOTÓN PARA PROCESAR ARCHIVOS - CORREGIDO
+        // BOTÓN PARA PROCESAR ARCHIVOS
         // =============================================
         submitDocumentsBtn.addEventListener('click', function(e) {
             e.preventDefault();
