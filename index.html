@@ -30,17 +30,6 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-        
-        input, textarea {
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
         }
         
         body {
@@ -74,11 +63,6 @@
             position: sticky;
             top: 0;
             z-index: 100;
-        }
-        
-        .header-left {
-            display: flex;
-            align-items: center;
         }
         
         .logo {
@@ -146,7 +130,6 @@
             overflow-y: auto;
             padding: 1rem;
             padding-bottom: 70px;
-            -webkit-overflow-scrolling: touch;
         }
         
         .card {
@@ -208,7 +191,6 @@
             cursor: pointer;
             text-align: center;
             font-size: 1rem;
-            -webkit-tap-highlight-color: transparent;
         }
         
         .btn-primary {
@@ -258,7 +240,6 @@
             font-size: 0.8rem;
             font-weight: 600;
             display: inline-block;
-            margin-left: 10px;
         }
         
         .status-pending {
@@ -291,7 +272,6 @@
             text-decoration: none;
             color: var(--text);
             transition: all 0.3s ease;
-            -webkit-tap-highlight-color: transparent;
         }
         
         .action-icon {
@@ -397,7 +377,6 @@
             margin-bottom: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            -webkit-tap-highlight-color: transparent;
         }
         
         .file-upload:hover {
@@ -511,7 +490,6 @@
             border-bottom: 1px solid var(--border);
             text-decoration: none;
             color: var(--text);
-            -webkit-tap-highlight-color: transparent;
         }
         
         .menu-icon {
@@ -567,15 +545,6 @@
             right: -5px;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.3s ease forwards;
-        }
-        
         .auth-container {
             max-width: 400px;
             margin: 0 auto;
@@ -594,7 +563,6 @@
             padding: 1rem;
             cursor: pointer;
             border-bottom: 3px solid transparent;
-            -webkit-tap-highlight-color: transparent;
         }
         
         .auth-tab.active {
@@ -604,17 +572,17 @@
         }
         
         .file-upload.upload-success {
-            border: 2px solid var(--success) !important;
-            background-color: #f8fff8 !important;
+            border: 2px solid var(--success);
+            background-color: #f8fff8;
         }
 
         .file-upload.upload-success i {
-            color: var(--success) !important;
+            color: var(--success);
         }
 
         .file-upload.upload-error {
-            border: 2px solid var(--accent) !important;
-            background-color: #fff5f5 !important;
+            border: 2px solid var(--accent);
+            background-color: #fff5f5;
         }
 
         .error-message {
@@ -628,23 +596,75 @@
             display: block;
         }
 
-        @media (max-width: 768px) {
-            .file-upload {
-                padding: 1.5rem;
-                min-height: 120px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
-            
-            .file-upload i {
-                font-size: 1.5rem;
-            }
-            
-            .btn {
-                padding: 15px 20px;
-                font-size: 1.1rem;
-            }
+        .validation-report {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            background: white;
+        }
+        .validation-header.valid {
+            background: #e8f5e8;
+            border-left: 4px solid #27ae60;
+        }
+        .validation-header.invalid {
+            background: #fdeaea;
+            border-left: 4px solid #e74c3c;
+        }
+        .validation-header {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .validation-score {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .validation-category {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .category-status.passed {
+            color: #27ae60;
+        }
+        .category-status.failed {
+            color: #e74c3c;
+        }
+        .validation-elements {
+            list-style: none;
+            padding: 0;
+        }
+        .validation-element {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .validation-element.passed {
+            color: #27ae60;
+        }
+        .validation-element.failed {
+            color: #e74c3c;
+        }
+        .element-status {
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+        .element-name {
+            flex: 1;
+        }
+        .element-value, .element-confidence {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-left: 0.5rem;
+        }
+        .recommendations {
+            background: #fff3cd;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #f39c12;
         }
 
         @media (max-width: 380px) {
@@ -1022,10 +1042,12 @@
         </nav>
     </div>
 
+    <script src="ine-validator.js"></script>
     <script>
         // Sistema de Usuarios
         let currentUser = null;
         let users = JSON.parse(localStorage.getItem('creditxpress_users')) || [];
+        const ineValidator = new INEValidator();
 
         // DOM Elements
         const pages = document.querySelectorAll('.page');
@@ -1364,7 +1386,6 @@
             
             const activePage = document.getElementById(pageId);
             activePage.classList.add('active');
-            activePage.classList.add('fade-in');
             
             navItems.forEach(item => {
                 item.classList.remove('active');
@@ -1732,6 +1753,76 @@
             document.querySelectorAll('.error-message').forEach(error => {
                 error.textContent = '';
             });
+        }
+
+        // =============================================
+        // VALIDACIÓN DE INE
+        // =============================================
+
+        // Configurar validación de INE
+        const idUpload = document.getElementById('idUpload');
+        const idFile = document.getElementById('idFile');
+        
+        idUpload.addEventListener('click', () => {
+            idFile.click();
+        });
+        
+        idFile.addEventListener('change', async (e) => {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const imageData = await readFileAsDataURL(file);
+                
+                // Mostrar que se está validando
+                const fileName = document.getElementById('idFileName');
+                fileName.textContent = `${file.name} (Validando...)`;
+                
+                // Validar INE
+                const results = await ineValidator.validateINE(imageData);
+                
+                // Mostrar resultados
+                displayValidationResults(results, file.name);
+            }
+        });
+
+        // Función para leer archivo como Data URL
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Función para mostrar resultados de validación
+        function displayValidationResults(results, fileName) {
+            const fileSize = formatFileSize(results.fileSize || 0);
+            const fileNameElement = document.getElementById('idFileName');
+            fileNameElement.textContent = `${fileName} (${fileSize}) - ${results.isValid ? 'Válida' : 'Inválida'}`;
+            
+            const uploadElement = document.getElementById('idUpload');
+            if (results.isValid) {
+                uploadElement.classList.add('upload-success');
+                uploadElement.classList.remove('upload-error');
+            } else {
+                uploadElement.classList.add('upload-error');
+                uploadElement.classList.remove('upload-success');
+            }
+            
+            // Mostrar reporte detallado
+            const reportHTML = ineValidator.generateReport(results);
+            const existingReport = document.getElementById('ineValidationReport');
+            if (existingReport) {
+                existingReport.remove();
+            }
+            
+            const reportElement = document.createElement('div');
+            reportElement.id = 'ineValidationReport';
+            reportElement.innerHTML = reportHTML;
+            
+            // Insertar después del upload de INE
+            const idUploadContainer = document.getElementById('idUpload').parentNode;
+            idUploadContainer.parentNode.insertBefore(reportElement, idUploadContainer.nextSibling);
         }
 
         // =============================================
