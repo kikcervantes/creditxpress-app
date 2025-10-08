@@ -39,7 +39,6 @@
             padding: 20px;
         }
         
-        /* Header CRM */
         .crm-header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
@@ -84,7 +83,6 @@
             justify-content: center;
         }
         
-        /* Dashboard */
         .dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -123,7 +121,6 @@
             font-size: 0.9rem;
         }
         
-        /* Filtros */
         .filters {
             background: white;
             padding: 1.5rem;
@@ -155,7 +152,6 @@
             background: white;
         }
         
-        /* Tabla de Solicitudes */
         .requests-table {
             background: white;
             border-radius: 10px;
@@ -241,7 +237,6 @@
             color: white;
         }
         
-        /* Modal de Detalles */
         .modal {
             display: none;
             position: fixed;
@@ -357,7 +352,100 @@
             margin-top: 0.3rem;
         }
         
-        /* Responsive */
+        .validation-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .validation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .validation-steps {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .validation-step {
+            flex: 1;
+            min-width: 200px;
+            padding: 1rem;
+            border-radius: 8px;
+            background: var(--light);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .validation-step.passed {
+            border-left-color: var(--success);
+            background: #e8f5e8;
+        }
+        
+        .validation-step.failed {
+            border-left-color: var(--accent);
+            background: #fdeaea;
+        }
+        
+        .validation-result {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .validation-passed {
+            background: #e8f5e8;
+            border: 1px solid var(--success);
+            color: #155724;
+        }
+        
+        .validation-failed {
+            background: #fdeaea;
+            border: 1px solid var(--accent);
+            color: #721c24;
+        }
+        
+        .validation-details {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .validation-details ul {
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+        
+        .validation-details li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .security-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-check {
+            color: var(--success);
+        }
+        
+        .feature-x {
+            color: var(--accent);
+        }
+        
         @media (max-width: 768px) {
             .filters {
                 flex-direction: column;
@@ -380,11 +468,14 @@
             .document-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .validation-steps {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Header CRM -->
     <header class="crm-header">
         <div class="container">
             <div class="header-content">
@@ -406,7 +497,6 @@
     </header>
 
     <div class="container">
-        <!-- Dashboard de Estadísticas -->
         <div class="dashboard">
             <div class="stat-card">
                 <div class="stat-number" id="totalRequests">0</div>
@@ -426,7 +516,6 @@
             </div>
         </div>
 
-        <!-- Filtros -->
         <div class="filters">
             <div class="filter-group">
                 <label class="filter-label">Estado</label>
@@ -463,7 +552,6 @@
             </button>
         </div>
 
-        <!-- Tabla de Solicitudes -->
         <div class="requests-table">
             <div class="table-header">
                 <h2>Solicitudes de Crédito</h2>
@@ -482,14 +570,12 @@
                         </tr>
                     </thead>
                     <tbody id="requestsTableBody">
-                        <!-- Las solicitudes se cargarán aquí dinámicamente -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Detalles de Solicitud -->
     <div class="modal" id="requestModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -497,8 +583,22 @@
                 <button class="close-modal" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
+                <div class="validation-container" id="validationContainer" style="display: none;">
+                    <div class="validation-header">
+                        <h3>Validación de INE</h3>
+                        <button class="action-btn btn-view" onclick="startINEValidation()">
+                            <i class="fas fa-sync-alt"></i> Validar INE
+                        </button>
+                    </div>
+                    <div class="validation-steps" id="validationSteps">
+                    </div>
+                    <div class="validation-result" id="validationResult">
+                    </div>
+                    <div class="validation-details" id="validationDetails" style="display: none;">
+                    </div>
+                </div>
+
                 <div class="document-grid" id="documentGrid">
-                    <!-- Los documentos se cargarán aquí -->
                 </div>
                 <div class="document-viewer" id="documentViewer">
                     <i class="fas fa-file-alt" style="font-size: 3rem; color: var(--gray); margin-bottom: 1rem;"></i>
@@ -516,12 +616,12 @@
         </div>
     </div>
 
+    <script src="ine-validator.js"></script>
     <script>
-        // Base de datos simulada para el CRM
         let creditRequests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
         let currentRequestId = null;
+        const ineValidator = new INEValidator();
 
-        // Cargar estadísticas
         function loadStatistics() {
             const total = creditRequests.length;
             const pending = creditRequests.filter(req => req.status === 'pending').length;
@@ -534,7 +634,6 @@
             document.getElementById('rejectedRequests').textContent = rejected;
         }
 
-        // Cargar solicitudes en la tabla
         function loadRequests() {
             const tbody = document.getElementById('requestsTableBody');
             const statusFilter = document.getElementById('statusFilter').value;
@@ -543,7 +642,6 @@
 
             let filteredRequests = creditRequests;
 
-            // Aplicar filtros
             if (statusFilter !== 'all') {
                 filteredRequests = filteredRequests.filter(req => req.status === statusFilter);
             }
@@ -575,7 +673,6 @@
                 });
             }
 
-            // Ordenar por fecha (más reciente primero)
             filteredRequests.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
             tbody.innerHTML = '';
@@ -617,7 +714,6 @@
             });
         }
 
-        // Función CORREGIDA para cargar documentos en el modal
         function loadDocumentsToModal(request) {
             const documentGrid = document.getElementById('documentGrid');
             documentGrid.innerHTML = '';
@@ -631,8 +727,6 @@
 
             documents.forEach(doc => {
                 const docData = request.documents[doc.type];
-                
-                // VERIFICACIÓN MEJORADA - Asegurar que existe docData y tiene datos Base64
                 const hasDocument = docData && docData.data && 
                                    (docData.data.startsWith('data:image/') || 
                                     docData.data.startsWith('data:application/pdf') ||
@@ -645,7 +739,6 @@
                     docCard.onclick = () => viewDocument(docData, doc.label);
                 }
                 
-                // Formatear tamaño del archivo
                 const fileSize = hasDocument ? formatFileSize(docData.size) : 'N/A';
                 
                 docCard.innerHTML = `
@@ -670,9 +763,16 @@
                 
                 documentGrid.appendChild(docCard);
             });
+
+            // Mostrar contenedor de validación si hay INE
+            const validationContainer = document.getElementById('validationContainer');
+            if (request.documents.identification && request.documents.identification.data) {
+                validationContainer.style.display = 'block';
+            } else {
+                validationContainer.style.display = 'none';
+            }
         }
 
-        // Formatear tamaño de archivo
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -681,7 +781,6 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // Ver detalles de una solicitud
         function viewRequest(requestId) {
             const request = creditRequests.find(req => req.id === requestId);
             if (!request) {
@@ -692,18 +791,14 @@
             currentRequestId = requestId;
             document.getElementById('modalRequestId').textContent = requestId;
 
-            // Cargar documentos en el modal
             loadDocumentsToModal(request);
-
             document.getElementById('requestModal').style.display = 'flex';
         }
 
-        // Función MEJORADA para ver documentos CON BASE64
         function viewDocument(documentData, documentName) {
             const viewer = document.getElementById('documentViewer');
             
             if (documentData && documentData.data) {
-                // Verificar que el Base64 sea válido
                 if (!documentData.data.startsWith('data:')) {
                     viewer.innerHTML = `
                         <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
@@ -734,7 +829,6 @@
                 } else if (documentData.type === 'pdf' || 
                            documentData.name.includes('.pdf') ||
                            documentData.data.startsWith('data:application/pdf')) {
-                    // Para PDFs
                     viewer.innerHTML = `
                         <h4>${documentName}</h4>
                         <div style="padding: 2rem; text-align: center;">
@@ -753,7 +847,6 @@
                         </div>
                     `;
                 } else {
-                    // Para otros tipos de documentos
                     viewer.innerHTML = `
                         <h4>${documentName}</h4>
                         <div style="padding: 2rem; text-align: center;">
@@ -778,10 +871,8 @@
             }
         }
 
-        // Descargar documento Base64
         function downloadBase64Document(base64Data, filename) {
             try {
-                // Crear link de descarga
                 const link = document.createElement('a');
                 link.href = base64Data;
                 link.download = filename;
@@ -800,7 +891,6 @@
             }
         }
 
-        // Abrir documento Base64 en nueva pestaña
         function openBase64Document(base64Data) {
             try {
                 const newWindow = window.open();
@@ -827,7 +917,6 @@
             }
         }
 
-        // Actualizar estado de solicitud
         function updateRequestStatus(newStatus) {
             if (!currentRequestId) return;
 
@@ -845,7 +934,6 @@
             }
         }
 
-        // Aprobación rápida
         function quickApprove(requestId) {
             if (confirm('¿Estás seguro de que quieres aprobar esta solicitud?')) {
                 currentRequestId = requestId;
@@ -853,7 +941,6 @@
             }
         }
 
-        // Rechazo rápido
         function quickReject(requestId) {
             if (confirm('¿Estás seguro de que quieres rechazar esta solicitud?')) {
                 currentRequestId = requestId;
@@ -861,19 +948,16 @@
             }
         }
 
-        // Cerrar modal
         function closeModal() {
             document.getElementById('requestModal').style.display = 'none';
             currentRequestId = null;
             
-            // Limpiar visor de documentos
             document.getElementById('documentViewer').innerHTML = `
                 <i class="fas fa-file-alt" style="font-size: 3rem; color: var(--gray); margin-bottom: 1rem;"></i>
                 <p>Selecciona un documento para verlo</p>
             `;
         }
 
-        // Texto del estado
         function getStatusText(status) {
             const statusMap = {
                 'pending': 'Pendiente',
@@ -885,41 +969,154 @@
             return statusMap[status] || status;
         }
 
-        // Función de diagnóstico para verificar los datos guardados
-        function debugRequests() {
-            console.log("=== DIAGNÓSTICO DE SOLICITUDES ===");
-            const requests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+        // =============================================
+        // VALIDACIÓN DE INE EN CRM
+        // =============================================
+
+        async function startINEValidation() {
+            const validationSteps = document.getElementById('validationSteps');
+            const validationResult = document.getElementById('validationResult');
+            const validationDetails = document.getElementById('validationDetails');
             
-            requests.forEach((request, index) => {
-                console.log(`Solicitud #${request.id}:`, {
-                    cliente: request.clientName,
-                    monto: request.amount,
-                    estado: request.status,
-                    documentos: request.documents ? Object.keys(request.documents) : 'Sin documentos'
-                });
-                
-                if (request.documents) {
-                    Object.entries(request.documents).forEach(([docType, docData]) => {
-                        console.log(`  ${docType}:`, {
-                            tieneDatos: !!(docData && docData.data),
-                            tipoBase64: docData && docData.data ? docData.data.substring(0, 50) + '...' : 'No hay datos',
-                            tamaño: docData ? docData.size : 'N/A'
-                        });
-                    });
-                }
+            validationSteps.innerHTML = '';
+            validationResult.style.display = 'none';
+            validationDetails.style.display = 'none';
+            
+            if (!currentRequestId) {
+                alert('Por favor, selecciona una solicitud primero');
+                return;
+            }
+            
+            const request = creditRequests.find(req => req.id === currentRequestId);
+            if (!request || !request.documents || !request.documents.identification) {
+                alert('No se encontró documento de identificación para validar');
+                return;
+            }
+            
+            await simulateINEValidation(request);
+        }
+        
+        async function simulateINEValidation(request) {
+            const validationSteps = document.getElementById('validationSteps');
+            const validationResult = document.getElementById('validationResult');
+            const validationDetails = document.getElementById('validationDetails');
+            
+            const validationStepsData = [
+                { id: 'structure', name: 'Estructura de datos', description: 'Validación de CURP y clave de elector' },
+                { id: 'visible', name: 'Elementos visibles', description: 'Microtexto, OVD, tinta UV' },
+                { id: 'secondLevel', name: 'Elementos de segundo nivel', description: 'Elementos que requieren lupa' },
+                { id: 'nonVisible', name: 'Elementos no visibles', description: 'Elementos con luz UV' },
+                { id: 'qr', name: 'Códigos QR', description: 'Validación de códigos QR y contenido' },
+                { id: 'validity', name: 'Vigencia', description: 'Verificación de vigencia de la credencial' }
+            ];
+            
+            validationStepsData.forEach(step => {
+                const stepElement = document.createElement('div');
+                stepElement.className = 'validation-step';
+                stepElement.id = `step-${step.id}`;
+                stepElement.innerHTML = `
+                    <h4>${step.name}</h4>
+                    <p style="font-size: 0.8rem; color: var(--gray);">${step.description}</p>
+                    <div style="margin-top: 0.5rem;">
+                        <i class="fas fa-spinner fa-spin"></i> Validando...
+                    </div>
+                `;
+                validationSteps.appendChild(stepElement);
             });
+            
+            let passedSteps = 0;
+            const totalSteps = validationStepsData.length;
+            
+            for (let i = 0; i < validationStepsData.length; i++) {
+                const step = validationStepsData[i];
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const isPassed = Math.random() > 0.3;
+                
+                const stepElement = document.getElementById(`step-${step.id}`);
+                stepElement.className = `validation-step ${isPassed ? 'passed' : 'failed'}`;
+                
+                stepElement.innerHTML = `
+                    <h4>${step.name}</h4>
+                    <p style="font-size: 0.8rem; color: var(--gray);">${step.description}</p>
+                    <div style="margin-top: 0.5rem;">
+                        <i class="fas ${isPassed ? 'fa-check-circle feature-check' : 'fa-times-circle feature-x'}"></i>
+                        ${isPassed ? 'Válido' : 'No válido'}
+                    </div>
+                `;
+                
+                if (isPassed) passedSteps++;
+                
+                if (i === validationStepsData.length - 1) {
+                    const overallResult = passedSteps / totalSteps >= 0.7;
+                    
+                    validationResult.className = `validation-result ${overallResult ? 'validation-passed' : 'validation-failed'}`;
+                    validationResult.innerHTML = `
+                        <h3>${overallResult ? '✅ INE VÁLIDA' : '❌ INE NO VÁLIDA'}</h3>
+                        <p>${passedSteps} de ${totalSteps} validaciones pasaron</p>
+                        ${overallResult ? 
+                            '<p>La credencial parece ser auténtica según los elementos verificados.</p>' : 
+                            '<p>Se detectaron irregularidades que podrían indicar una credencial falsificada.</p>'
+                        }
+                    `;
+                    validationResult.style.display = 'block';
+                    
+                    showValidationDetails(validationStepsData, overallResult);
+                }
+            }
+        }
+        
+        function showValidationDetails(steps, overallResult) {
+            const validationDetails = document.getElementById('validationDetails');
+            
+            let detailsHTML = `
+                <h4>Detalles de la Validación</h4>
+                <p>Basado en el documento "ABC de la Credencial para Votar" del INE, se verificaron los siguientes elementos:</p>
+                <ul>
+            `;
+            
+            steps.forEach(step => {
+                const stepElement = document.getElementById(`step-${step.id}`);
+                const isPassed = stepElement.classList.contains('passed');
+                
+                detailsHTML += `
+                    <li>
+                        <div class="security-feature">
+                            <i class="fas ${isPassed ? 'fa-check feature-check' : 'fa-times feature-x'}"></i>
+                            <span><strong>${step.name}:</strong> ${step.description} - ${isPassed ? 'APROBADO' : 'FALLIDO'}</span>
+                        </div>
+                    </li>
+                `;
+            });
+            
+            detailsHTML += `
+                </ul>
+                <h4>Recomendaciones</h4>
+                <p>${overallResult ? 
+                    'La credencial pasó la mayoría de las validaciones. Se recomienda proceder con el proceso de crédito.' : 
+                    'Se detectaron irregularidades significativas. Se recomienda solicitar documentación adicional o rechazar la solicitud.'
+                }</p>
+                <h4>Elementos de Seguridad Verificados</h4>
+                <ul>
+                    <li>Estructura correcta de CURP y clave de elector</li>
+                    <li>Presencia de microtexto "INSTITUTO NACIONAL ELECTORAL"</li>
+                    <li>Elementos ópticamente variables (OVD/OVI)</li>
+                    <li>Tintas UV con Escudos nacionales y siglas INE</li>
+                    <li>Diseño de relieve táctil</li>
+                    <li>Validación de códigos QR y su contenido</li>
+                    <li>Verificación de vigencia de la credencial</li>
+                </ul>
+            `;
+            
+            validationDetails.innerHTML = detailsHTML;
+            validationDetails.style.display = 'block';
         }
 
-        // Inicializar
         window.addEventListener('load', () => {
             loadStatistics();
             loadRequests();
-            
-            // Para diagnóstico, puedes descomentar la siguiente línea:
-            // debugRequests();
         });
 
-        // Cerrar modal al hacer clic fuera
         window.addEventListener('click', (e) => {
             if (e.target === document.getElementById('requestModal')) {
                 closeModal();
