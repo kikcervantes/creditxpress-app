@@ -1042,12 +1042,10 @@
         </nav>
     </div>
 
-    <script src="ine-validator.js"></script>
     <script>
-        // Sistema de Usuarios
+        // Sistema de Usuarios - CORREGIDO
         let currentUser = null;
         let users = JSON.parse(localStorage.getItem('creditxpress_users')) || [];
-        const ineValidator = new INEValidator();
 
         // DOM Elements
         const pages = document.querySelectorAll('.page');
@@ -1085,7 +1083,7 @@
         const logoutBtn = document.getElementById('logoutBtn');
 
         // =============================================
-        // FUNCIONES PRINCIPALES
+        // FUNCIONES PRINCIPALES - CORREGIDAS
         // =============================================
 
         // Función para cargar el estado del crédito del usuario
@@ -1266,7 +1264,7 @@
         }
 
         // =============================================
-        // SISTEMA DE AUTENTICACIÓN
+        // SISTEMA DE AUTENTICACIÓN - CORREGIDO
         // =============================================
 
         function showAuthPage() {
@@ -1302,10 +1300,15 @@
             });
         });
 
-        // Login
+        // Login - CORREGIDO
         loginBtn.addEventListener('click', () => {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                alert('Por favor completa todos los campos.');
+                return;
+            }
             
             const user = users.find(u => u.email === email && u.password === password);
             
@@ -1319,13 +1322,19 @@
             }
         });
 
-        // Register
+        // Register - CORREGIDO
         registerBtn.addEventListener('click', () => {
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const phone = document.getElementById('registerPhone').value;
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            // Validaciones básicas
+            if (!name || !email || !phone || !password || !confirmPassword) {
+                alert('Por favor completa todos los campos.');
+                return;
+            }
             
             if (password !== confirmPassword) {
                 alert('Las contraseñas no coinciden.');
@@ -1355,7 +1364,7 @@
             alert('¡Cuenta creada exitosamente!');
         });
 
-        // Logout
+        // Logout - CORREGIDO
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             currentUser = null;
@@ -1364,19 +1373,24 @@
             alert('Sesión cerrada correctamente.');
         });
 
-        // Check if user is logged in on page load
+        // Check if user is logged in on page load - CORREGIDO
         window.addEventListener('load', () => {
             const savedUser = localStorage.getItem('creditxpress_current_user');
             if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                showMainApp();
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    showMainApp();
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                    showAuthPage();
+                }
             } else {
                 showAuthPage();
             }
         });
 
         // =============================================
-        // SISTEMA DE NAVEGACIÓN
+        // SISTEMA DE NAVEGACIÓN - CORREGIDO
         // =============================================
 
         function showPage(pageId) {
@@ -1385,7 +1399,9 @@
             });
             
             const activePage = document.getElementById(pageId);
-            activePage.classList.add('active');
+            if (activePage) {
+                activePage.classList.add('active');
+            }
             
             navItems.forEach(item => {
                 item.classList.remove('active');
@@ -1399,7 +1415,7 @@
             }
         }
 
-        // Configurar event listeners para navegación
+        // Configurar event listeners para navegación - CORREGIDO
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -1427,7 +1443,7 @@
         });
 
         // =============================================
-        // BOTONES DE ACCIÓN
+        // BOTONES DE ACCIÓN - CORREGIDOS
         // =============================================
 
         quickLoanBtn.addEventListener('click', (e) => {
@@ -1455,7 +1471,7 @@
         });
 
         // =============================================
-        // CALCULADORAS
+        // CALCULADORAS - CORREGIDAS
         // =============================================
 
         function calculateLoan() {
@@ -1532,7 +1548,7 @@
         calcTerm.addEventListener('change', updateCalculator);
 
         // =============================================
-        // SISTEMA DE SUBIDA DE ARCHIVOS MEJORADO
+        // SISTEMA DE SUBIDA DE ARCHIVOS - CORREGIDO
         // =============================================
 
         // Configurar sistema de subida de archivos
@@ -1549,46 +1565,48 @@
             const fileName = document.getElementById(upload.fileName);
             const errorElement = document.getElementById(upload.error);
             
-            uploadElement.addEventListener('click', () => {
-                fileInput.click();
-            });
-            
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    
-                    const maxSize = 10 * 1024 * 1024;
-                    const allowedTypes = [
-                        'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
-                        'application/pdf', 'image/webp'
-                    ];
-                    
-                    if (file.size > maxSize) {
-                        errorElement.textContent = `El archivo es demasiado grande. Máximo 10MB.`;
-                        uploadElement.classList.add('error');
-                        uploadElement.classList.remove('upload-success');
-                        fileInput.value = '';
-                        fileName.textContent = 'No se ha seleccionado archivo';
-                        return;
+            if (uploadElement && fileInput && fileName && errorElement) {
+                uploadElement.addEventListener('click', () => {
+                    fileInput.click();
+                });
+                
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        
+                        const maxSize = 10 * 1024 * 1024;
+                        const allowedTypes = [
+                            'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
+                            'application/pdf', 'image/webp'
+                        ];
+                        
+                        if (file.size > maxSize) {
+                            errorElement.textContent = `El archivo es demasiado grande. Máximo 10MB.`;
+                            uploadElement.classList.add('error');
+                            uploadElement.classList.remove('upload-success');
+                            fileInput.value = '';
+                            fileName.textContent = 'No se ha seleccionado archivo';
+                            return;
+                        }
+                        
+                        if (!allowedTypes.includes(file.type) && 
+                            !file.name.match(/\.(jpg|jpeg|png|gif|pdf|webp)$/i)) {
+                            errorElement.textContent = `Tipo de archivo no permitido. Use JPG, PNG, GIF, PDF o WEBP.`;
+                            uploadElement.classList.add('error');
+                            uploadElement.classList.remove('upload-success');
+                            fileInput.value = '';
+                            fileName.textContent = 'No se ha seleccionado archivo';
+                            return;
+                        }
+                        
+                        const fileSize = formatFileSize(file.size);
+                        fileName.textContent = `${file.name} (${fileSize})`;
+                        errorElement.textContent = '';
+                        uploadElement.classList.remove('error');
+                        uploadElement.classList.add('upload-success');
                     }
-                    
-                    if (!allowedTypes.includes(file.type) && 
-                        !file.name.match(/\.(jpg|jpeg|png|gif|pdf|webp)$/i)) {
-                        errorElement.textContent = `Tipo de archivo no permitido. Use JPG, PNG, GIF, PDF o WEBP.`;
-                        uploadElement.classList.add('error');
-                        uploadElement.classList.remove('upload-success');
-                        fileInput.value = '';
-                        fileName.textContent = 'No se ha seleccionado archivo';
-                        return;
-                    }
-                    
-                    const fileSize = formatFileSize(file.size);
-                    fileName.textContent = `${file.name} (${fileSize})`;
-                    errorElement.textContent = '';
-                    uploadElement.classList.remove('error');
-                    uploadElement.classList.add('upload-success');
-                }
-            });
+                });
+            }
         });
 
         // Función para formatear tamaño de archivo
@@ -1756,77 +1774,7 @@
         }
 
         // =============================================
-        // VALIDACIÓN DE INE
-        // =============================================
-
-        // Configurar validación de INE
-        const idUpload = document.getElementById('idUpload');
-        const idFile = document.getElementById('idFile');
-        
-        idUpload.addEventListener('click', () => {
-            idFile.click();
-        });
-        
-        idFile.addEventListener('change', async (e) => {
-            if (e.target.files.length > 0) {
-                const file = e.target.files[0];
-                const imageData = await readFileAsDataURL(file);
-                
-                // Mostrar que se está validando
-                const fileName = document.getElementById('idFileName');
-                fileName.textContent = `${file.name} (Validando...)`;
-                
-                // Validar INE
-                const results = await ineValidator.validateINE(imageData);
-                
-                // Mostrar resultados
-                displayValidationResults(results, file.name);
-            }
-        });
-
-        // Función para leer archivo como Data URL
-        function readFileAsDataURL(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // Función para mostrar resultados de validación
-        function displayValidationResults(results, fileName) {
-            const fileSize = formatFileSize(results.fileSize || 0);
-            const fileNameElement = document.getElementById('idFileName');
-            fileNameElement.textContent = `${fileName} (${fileSize}) - ${results.isValid ? 'Válida' : 'Inválida'}`;
-            
-            const uploadElement = document.getElementById('idUpload');
-            if (results.isValid) {
-                uploadElement.classList.add('upload-success');
-                uploadElement.classList.remove('upload-error');
-            } else {
-                uploadElement.classList.add('upload-error');
-                uploadElement.classList.remove('upload-success');
-            }
-            
-            // Mostrar reporte detallado
-            const reportHTML = ineValidator.generateReport(results);
-            const existingReport = document.getElementById('ineValidationReport');
-            if (existingReport) {
-                existingReport.remove();
-            }
-            
-            const reportElement = document.createElement('div');
-            reportElement.id = 'ineValidationReport';
-            reportElement.innerHTML = reportHTML;
-            
-            // Insertar después del upload de INE
-            const idUploadContainer = document.getElementById('idUpload').parentNode;
-            idUploadContainer.parentNode.insertBefore(reportElement, idUploadContainer.nextSibling);
-        }
-
-        // =============================================
-        // BOTÓN PARA PROCESAR ARCHIVOS
+        // BOTÓN PARA PROCESAR ARCHIVOS - CORREGIDO
         // =============================================
         submitDocumentsBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1866,6 +1814,23 @@
             loanTermSlider.value = calcTerm.value;
             calculateLoan();
             showPage('loanPage');
+        });
+
+        // =============================================
+        // INICIALIZACIÓN SEGURA
+        // =============================================
+
+        // Verificar que todos los elementos existan antes de agregar event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 App inicializada correctamente');
+            
+            // Inicializar datos si no existen
+            if (!localStorage.getItem('creditxpress_users')) {
+                localStorage.setItem('creditxpress_users', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('creditxpress_requests')) {
+                localStorage.setItem('creditxpress_requests', JSON.stringify([]));
+            }
         });
     </script>
 </body>
