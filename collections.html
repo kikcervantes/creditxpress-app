@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreditXpress - Sistema de Cobranza</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a5276;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
+            --gray: #7f8c8d;
+            --text: #333333;
+            --border: #e0e0e0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .crm-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            margin-left: 10px;
+            font-weight: 700;
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+        }
+        
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stat-card.pending {
+            border-left-color: var(--warning);
+        }
+        
+        .stat-card.overdue {
+            border-left-color: var(--accent);
+        }
+        
+        .stat-card.paid {
+            border-left-color: var(--success);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .filter-label {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            background: white;
+        }
+        
+        .collections-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background: var(--light);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: var(--light);
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-overdue {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-default {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 5px;
+        }
+        
+        .btn-view {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-contact {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-remind {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-payment {
+            background: var(--success);
+            color: white;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .payment-history {
+            margin-top: 1.5rem;
+        }
+        
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .payment-date {
+            font-weight: 600;
+        }
+        
+        .payment-amount {
+            font-weight: 600;
+            color: var(--success);
+        }
+        
+        .payment-status {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+        
+        .payment-form {
+            margin-top: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+        }
+        
+        .contact-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .contact-option {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-option:hover {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .contact-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .overdue-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .overdue-1 {
+            background-color: var(--warning);
+        }
+        
+        .overdue-2 {
+            background-color: #ff9800;
+        }
+        
+        .overdue-3 {
+            background-color: var(--accent);
+        }
+        
+        .overdue-4 {
+            background-color: #c62828;
+        }
+        
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            th, td {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="crm-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">💰</span>
+                    <h1>CreditXpress - Cobranza</h1>
+                </div>
+                <div class="admin-info">
+                    <div class="admin-avatar">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <div>Administrador de Cobranza</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Panel de Gestión</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard">
+            <div class="stat-card">
+                <div class="stat-number" id="totalPayments">0</div>
+                <div class="stat-label">Total por Cobrar</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="stat-number" id="pendingPayments">0</div>
+                <div class="stat-label">Pagos Pendientes</div>
+            </div>
+            <div class="stat-card overdue">
+                <div class="stat-number" id="overduePayments">0</div>
+                <div class="stat-label">Pagos Vencidos</div>
+            </div>
+            <div class="stat-card paid">
+                <div class="stat-number" id="paidPayments">0</div>
+                <div class="stat-label">Pagos Realizados</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label class="filter-label">Estado de Pago</label>
+                <select class="filter-select" id="paymentFilter">
+                    <option value="all">Todos los estados</option>
+                    <option value="pending">Pendiente</option>
+                    <option value="overdue">Vencido</option>
+                    <option value="paid">Pagado</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Días de Atraso</label>
+                <select class="filter-select" id="daysFilter">
+                    <option value="all">Todos</option>
+                    <option value="1-7">1-7 días</option>
+                    <option value="8-15">8-15 días</option>
+                    <option value="16-30">16-30 días</option>
+                    <option value="31+">Más de 30 días</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Monto</label>
+                <select class="filter-select" id="amountFilter">
+                    <option value="all">Todos los montos</option>
+                    <option value="0-1000">$0 - $1,000</option>
+                    <option value="1001-2000">$1,001 - $2,000</option>
+                    <option value="2001-3000">$2,001 - $3,000</option>
+                    <option value="3001+">Más de $3,000</option>
+                </select>
+            </div>
+            <button class="action-btn btn-view" onclick="loadCollections()">
+                <i class="fas fa-sync-alt"></i> Actualizar
+            </button>
+        </div>
+
+        <div class="collections-table">
+            <div class="table-header">
+                <h2>Gestión de Cobranza</h2>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Crédito</th>
+                            <th>Próximo Pago</th>
+                            <th>Monto</th>
+                            <th>Días Atraso</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="collectionsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="collectionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalles de Cobranza - <span id="modalClientName"></span></h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="clientInfo">
+                    <h4>Información del Cliente</h4>
+                    <p><strong>Email:</strong> <span id="clientEmail"></span></p>
+                    <p><strong>Teléfono:</strong> <span id="clientPhone"></span></p>
+                    <p><strong>Crédito:</strong> $<span id="creditAmount"></span> - <span id="creditTerm"></span> meses</p>
+                    <p><strong>Estado del Crédito:</strong> <span id="creditStatus"></span></p>
+                </div>
+                
+                <div class="payment-history" id="paymentHistory">
+                    <h4>Historial de Pagos</h4>
+                    <div id="paymentsList">
+                    </div>
+                </div>
+                
+                <div class="contact-options">
+                    <div class="contact-option" onclick="sendReminder('email')">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>Recordatorio por Email</div>
+                    </div>
+                    <div class="contact-option" onclick="sendReminder('sms')">
+                        <div class="contact-icon">
+                            <i class="fas fa-sms"></i>
+                        </div>
+                        <div>Recordatorio por SMS</div>
+                    </div>
+                    <div class="contact-option" onclick="sendReminder('call')">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>Llamada de Cobranza</div>
+                    </div>
+                    <div class="contact-option" onclick="showPaymentForm()">
+                        <div class="contact-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div>Registrar Pago</div>
+                    </div>
+                </div>
+                
+                <div class="payment-form" id="paymentForm" style="display: none;">
+                    <h4>Registrar Pago</h4>
+                    <div class="form-group">
+                        <label class="form-label">Monto del Pago</label>
+                        <input type="number" id="paymentAmount" class="form-control" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fecha de Pago</label>
+                        <input type="date" id="paymentDate" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Método de Pago</label>
+                        <select id="paymentMethod" class="form-control">
+                            <option value="transfer">Transferencia</option>
+                            <option value="cash">Efectivo</option>
+                            <option value="card">Tarjeta</option>
+                            <option value="other">Otro</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button class="action-btn btn-payment" onclick="registerPayment()">
+                            <i class="fas fa-check"></i> Registrar Pago
+                        </button>
+                        <button class="action-btn btn-view" onclick="hidePaymentForm()">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo para el sistema de cobranza
+        let collections = JSON.parse(localStorage.getItem('creditxpress_collections')) || [];
+        let currentClientId = null;
+        
+        // Si no hay datos, inicializar con datos de ejemplo
+        if (collections.length === 0) {
+            initializeSampleData();
+        }
+
+        function initializeSampleData() {
+            const sampleCollections = [
+                {
+                    id: 1,
+                    clientId: 1001,
+                    clientName: "Juan Pérez García",
+                    clientEmail: "juan.perez@email.com",
+                    clientPhone: "55 1234 5678",
+                    creditId: 5001,
+                    creditAmount: 5000,
+                    creditTerm: 6,
+                    creditStatus: "approved",
+                    monthlyPayment: 1000,
+                    nextPaymentDate: "2023-11-15",
+                    payments: [
+                        { date: "2023-10-15", amount: 1000, method: "transfer", status: "paid" },
+                        { date: "2023-09-15", amount: 1000, method: "transfer", status: "paid" }
+                    ],
+                    status: "pending"
+                },
+                {
+                    id: 2,
+                    clientId: 1002,
+                    clientName: "María López Hernández",
+                    clientEmail: "maria.lopez@email.com",
+                    clientPhone: "55 2345 6789",
+                    creditId: 5002,
+                    creditAmount: 3000,
+                    creditTerm: 6,
+                    creditStatus: "approved",
+                    monthlyPayment: 600,
+                    nextPaymentDate: "2023-10-10",
+                    payments: [
+                        { date: "2023-09-10", amount: 600, method: "cash", status: "paid" },
+                        { date: "2023-08-10", amount: 600, method: "cash", status: "paid" },
+                        { date: "2023-07-10", amount: 600, method: "cash", status: "paid" }
+                    ],
+                    status: "overdue",
+                    overdueDays: 15
+                },
+                {
+                    id: 3,
+                    clientId: 1003,
+                    clientName: "Carlos Rodríguez Martínez",
+                    clientEmail: "carlos.rodriguez@email.com",
+                    clientPhone: "55 3456 7890",
+                    creditId: 5003,
+                    creditAmount: 4000,
+                    creditTerm: 4,
+                    creditStatus: "approved",
+                    monthlyPayment: 1200,
+                    nextPaymentDate: "2023-11-05",
+                    payments: [
+                        { date: "2023-10-05", amount: 1200, method: "card", status: "paid" }
+                    ],
+                    status: "pending"
+                },
+                {
+                    id: 4,
+                    clientId: 1004,
+                    clientName: "Ana García Sánchez",
+                    clientEmail: "ana.garcia@email.com",
+                    clientPhone: "55 4567 8901",
+                    creditId: 5004,
+                    creditAmount: 2000,
+                    creditTerm: 3,
+                    creditStatus: "approved",
+                    monthlyPayment: 800,
+                    nextPaymentDate: "2023-09-25",
+                    payments: [
+                        { date: "2023-08-25", amount: 800, method: "transfer", status: "paid" }
+                    ],
+                    status: "overdue",
+                    overdueDays: 35
+                }
+            ];
+            
+            collections = sampleCollections;
+            localStorage.setItem('creditxpress_collections', JSON.stringify(collections));
+        }
+
+        function loadStatistics() {
+            const total = collections.reduce((sum, collection) => {
+                const paidAmount = collection.payments.filter(p => p.status === 'paid')
+                    .reduce((paidSum, payment) => paidSum + payment.amount, 0);
+                const remaining = collection.creditAmount - paidAmount;
+                return sum + remaining;
+            }, 0);
+            
+            const pending = collections.filter(c => c.status === 'pending').length;
+            const overdue = collections.filter(c => c.status === 'overdue').length;
+            const paid = collections.filter(c => c.status === 'paid').length;
+
+            document.getElementById('totalPayments').textContent = `$${total.toLocaleString()}`;
+            document.getElementById('pendingPayments').textContent = pending;
+            document.getElementById('overduePayments').textContent = overdue;
+            document.getElementById('paidPayments').textContent = paid;
+        }
+
+        function loadCollections() {
+            const tbody = document.getElementById('collectionsTableBody');
+            const paymentFilter = document.getElementById('paymentFilter').value;
+            const daysFilter = document.getElementById('daysFilter').value;
+            const amountFilter = document.getElementById('amountFilter').value;
+
+            let filteredCollections = collections;
+
+            if (paymentFilter !== 'all') {
+                filteredCollections = filteredCollections.filter(c => c.status === paymentFilter);
+            }
+
+            if (daysFilter !== 'all') {
+                filteredCollections = filteredCollections.filter(c => {
+                    if (!c.overdueDays) return false;
+                    
+                    switch (daysFilter) {
+                        case '1-7':
+                            return c.overdueDays >= 1 && c.overdueDays <= 7;
+                        case '8-15':
+                            return c.overdueDays >= 8 && c.overdueDays <= 15;
+                        case '16-30':
+                            return c.overdueDays >= 16 && c.overdueDays <= 30;
+                        case '31+':
+                            return c.overdueDays >= 31;
+                        default:
+                            return true;
+                    }
+                });
+            }
+
+            if (amountFilter !== 'all') {
+                filteredCollections = filteredCollections.filter(c => {
+                    const paidAmount = c.payments.filter(p => p.status === 'paid')
+                        .reduce((sum, payment) => sum + payment.amount, 0);
+                    const remaining = c.creditAmount - paidAmount;
+                    
+                    switch (amountFilter) {
+                        case '0-1000':
+                            return remaining <= 1000;
+                        case '1001-2000':
+                            return remaining > 1000 && remaining <= 2000;
+                        case '2001-3000':
+                            return remaining > 2000 && remaining <= 3000;
+                        case '3001+':
+                            return remaining > 3000;
+                        default:
+                            return true;
+                    }
+                });
+            }
+
+            tbody.innerHTML = '';
+
+            filteredCollections.forEach(collection => {
+                const paidAmount = collection.payments.filter(p => p.status === 'paid')
+                    .reduce((sum, payment) => sum + payment.amount, 0);
+                const remaining = collection.creditAmount - paidAmount;
+                const nextPayment = collection.monthlyPayment;
+                
+                const row = document.createElement('tr');
+                
+                // Determinar el indicador de atraso
+                let overdueIndicator = '';
+                if (collection.overdueDays) {
+                    let indicatorClass = 'overdue-1';
+                    if (collection.overdueDays > 7 && collection.overdueDays <= 15) {
+                        indicatorClass = 'overdue-2';
+                    } else if (collection.overdueDays > 15 && collection.overdueDays <= 30) {
+                        indicatorClass = 'overdue-3';
+                    } else if (collection.overdueDays > 30) {
+                        indicatorClass = 'overdue-4';
+                    }
+                    overdueIndicator = `<span class="overdue-indicator ${indicatorClass}"></span>`;
+                }
+                
+                row.innerHTML = `
+                    <td>
+                        <strong>${collection.clientName}</strong><br>
+                        <small>${collection.clientEmail}</small>
+                    </td>
+                    <td>
+                        $${collection.creditAmount.toLocaleString()}<br>
+                        <small>${collection.creditTerm} meses</small>
+                    </td>
+                    <td>
+                        ${collection.nextPaymentDate}<br>
+                        <small style="color: var(--gray);">$${nextPayment.toLocaleString()}</small>
+                    </td>
+                    <td>
+                        $${remaining.toLocaleString()}<br>
+                        <small style="color: var(--gray);">Restante</small>
+                    </td>
+                    <td>
+                        ${collection.overdueDays ? `${overdueIndicator} ${collection.overdueDays} días` : 'Al día'}
+                    </td>
+                    <td>
+                        <span class="status-badge status-${collection.status}">
+                            ${getStatusText(collection.status)}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="action-btn btn-view" onclick="viewCollection(${collection.id})">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                        <button class="action-btn btn-contact" onclick="viewCollection(${collection.id})">
+                            <i class="fas fa-phone"></i> Contactar
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function viewCollection(collectionId) {
+            const collection = collections.find(c => c.id === collectionId);
+            if (!collection) {
+                alert('Registro de cobranza no encontrado');
+                return;
+            }
+
+            currentClientId = collectionId;
+            
+            document.getElementById('modalClientName').textContent = collection.clientName;
+            document.getElementById('clientEmail').textContent = collection.clientEmail;
+            document.getElementById('clientPhone').textContent = collection.clientPhone;
+            document.getElementById('creditAmount').textContent = collection.creditAmount.toLocaleString();
+            document.getElementById('creditTerm').textContent = collection.creditTerm;
+            document.getElementById('creditStatus').textContent = getStatusText(collection.creditStatus);
+            
+            // Cargar historial de pagos
+            const paymentsList = document.getElementById('paymentsList');
+            paymentsList.innerHTML = '';
+            
+            if (collection.payments && collection.payments.length > 0) {
+                collection.payments.forEach(payment => {
+                    const paymentItem = document.createElement('div');
+                    paymentItem.className = 'payment-item';
+                    paymentItem.innerHTML = `
+                        <div class="payment-date">${payment.date}</div>
+                        <div class="payment-amount">$${payment.amount.toLocaleString()}</div>
+                        <div class="payment-status status-badge status-${payment.status}">
+                            ${getStatusText(payment.status)}
+                        </div>
+                    `;
+                    paymentsList.appendChild(paymentItem);
+                });
+            } else {
+                paymentsList.innerHTML = '<p>No hay pagos registrados</p>';
+            }
+            
+            document.getElementById('collectionModal').style.display = 'flex';
+            document.getElementById('paymentForm').style.display = 'none';
+        }
+
+        function sendReminder(type) {
+            const collection = collections.find(c => c.id === currentClientId);
+            if (!collection) return;
+            
+            let message = '';
+            
+            switch (type) {
+                case 'email':
+                    message = `📧 Recordatorio enviado por email a ${collection.clientEmail}`;
+                    break;
+                case 'sms':
+                    message = `📱 Recordatorio enviado por SMS al ${collection.clientPhone}`;
+                    break;
+                case 'call':
+                    message = `📞 Llamada de recordatorio realizada al ${collection.clientPhone}`;
+                    break;
+            }
+            
+            // Registrar la acción en el historial
+            if (!collection.contactHistory) {
+                collection.contactHistory = [];
+            }
+            
+            collection.contactHistory.push({
+                date: new Date().toISOString().split('T')[0],
+                type: type,
+                message: message
+            });
+            
+            localStorage.setItem('creditxpress_collections', JSON.stringify(collections));
+            
+            alert(`✅ ${message}`);
+        }
+
+        function showPaymentForm() {
+            document.getElementById('paymentForm').style.display = 'block';
+            
+            // Establecer valores por defecto
+            const collection = collections.find(c => c.id === currentClientId);
+            if (collection) {
+                document.getElementById('paymentAmount').value = collection.monthlyPayment;
+                document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+            }
+        }
+
+        function hidePaymentForm() {
+            document.getElementById('paymentForm').style.display = 'none';
+        }
+
+        function registerPayment() {
+            const amount = parseFloat(document.getElementById('paymentAmount').value);
+            const date = document.getElementById('paymentDate').value;
+            const method = document.getElementById('paymentMethod').value;
+            
+            if (!amount || amount <= 0) {
+                alert('Por favor ingresa un monto válido');
+                return;
+            }
+            
+            if (!date) {
+                alert('Por favor selecciona una fecha');
+                return;
+            }
+            
+            const collectionIndex = collections.findIndex(c => c.id === currentClientId);
+            if (collectionIndex === -1) return;
+            
+            // Agregar el pago
+            collections[collectionIndex].payments.push({
+                date: date,
+                amount: amount,
+                method: method,
+                status: 'paid'
+            });
+            
+            // Recalcular estado
+            updateCollectionStatus(collectionIndex);
+            
+            localStorage.setItem('creditxpress_collections', JSON.stringify(collections));
+            
+            alert('✅ Pago registrado correctamente');
+            
+            // Actualizar la vista
+            viewCollection(currentClientId);
+            hidePaymentForm();
+            loadStatistics();
+            loadCollections();
+        }
+
+        function updateCollectionStatus(collectionIndex) {
+            const collection = collections[collectionIndex];
+            
+            // Calcular el monto pagado
+            const paidAmount = collection.payments.filter(p => p.status === 'paid')
+                .reduce((sum, payment) => sum + payment.amount, 0);
+            
+            // Verificar si el crédito está completamente pagado
+            if (paidAmount >= collection.creditAmount) {
+                collection.status = 'paid';
+                collection.overdueDays = 0;
+                return;
+            }
+            
+            // Calcular días de atraso
+            const today = new Date();
+            const nextPaymentDate = new Date(collection.nextPaymentDate);
+            const daysOverdue = Math.floor((today - nextPaymentDate) / (1000 * 60 * 60 * 24));
+            
+            if (daysOverdue > 0) {
+                collection.status = 'overdue';
+                collection.overdueDays = daysOverdue;
+            } else {
+                collection.status = 'pending';
+                collection.overdueDays = 0;
+            }
+            
+            // Actualizar la fecha del próximo pago si es necesario
+            if (paidAmount > 0) {
+                const lastPaymentDate = new Date(collection.payments
+                    .filter(p => p.status === 'paid')
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))[0].date);
+                
+                const nextPayment = new Date(lastPaymentDate);
+                nextPayment.setMonth(nextPayment.getMonth() + 1);
+                collection.nextPaymentDate = nextPayment.toISOString().split('T')[0];
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('collectionModal').style.display = 'none';
+            currentClientId = null;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'Pendiente',
+                'overdue': 'Vencido',
+                'paid': 'Pagado',
+                'approved': 'Aprobado',
+                'rejected': 'Rechazado'
+            };
+            return statusMap[status] || status;
+        }
+
+        // Función para sincronizar con el CRM y la app
+        function syncWithCRM() {
+            // Obtener solicitudes aprobadas del CRM
+            const creditRequests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+            const approvedRequests = creditRequests.filter(req => req.status === 'approved');
+            
+            // Para cada solicitud aprobada, verificar si ya existe en cobranza
+            approvedRequests.forEach(request => {
+                const existingCollection = collections.find(c => c.creditId === request.id);
+                
+                if (!existingCollection) {
+                    // Crear nueva entrada en cobranza
+                    const newCollection = {
+                        id: Date.now(),
+                        clientId: request.clientId || Date.now(),
+                        clientName: request.clientName,
+                        clientEmail: request.clientEmail,
+                        clientPhone: request.clientPhone,
+                        creditId: request.id,
+                        creditAmount: request.amount,
+                        creditTerm: request.term,
+                        creditStatus: request.status,
+                        monthlyPayment: Math.round((request.amount + (request.amount * 0.1 * request.term)) / request.term),
+                        nextPaymentDate: new Date().toISOString().split('T')[0],
+                        payments: [],
+                        status: 'pending'
+                    };
+                    
+                    collections.push(newCollection);
+                }
+            });
+            
+            localStorage.setItem('creditxpress_collections', JSON.stringify(collections));
+            loadStatistics();
+            loadCollections();
+            
+            console.log('✅ Datos sincronizados con CRM');
+        }
+
+        // Función para notificar a la app sobre atrasos
+        function updateAppNotifications() {
+            const overdueCollections = collections.filter(c => c.status === 'overdue');
+            
+            // Aquí podrías enviar notificaciones a la app
+            // Por ahora, solo actualizamos el localStorage que la app puede leer
+            localStorage.setItem('creditxpress_overdue_notifications', JSON.stringify(overdueCollections));
+            
+            console.log(`📢 ${overdueCollections.length} notificaciones de atraso actualizadas`);
+        }
+
+        window.addEventListener('load', () => {
+            syncWithCRM();
+            loadStatistics();
+            loadCollections();
+            
+            // Sincronizar cada 30 segundos
+            setInterval(syncWithCRM, 30000);
+            setInterval(updateAppNotifications, 60000);
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('collectionModal')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
