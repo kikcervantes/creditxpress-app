@@ -382,6 +382,25 @@
             background-color: #c62828;
         }
         
+        .sync-status {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .sync-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .sync-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
         @media (max-width: 768px) {
             .filters {
                 flex-direction: column;
@@ -421,7 +440,7 @@
                     </div>
                     <div>
                         <div>Administrador de Cobranza</div>
-                        <div style="font-size: 0.8rem; opacity: 0.8;">Panel de Gestión</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Conectado con App y CRM</div>
                     </div>
                 </div>
             </div>
@@ -429,9 +448,13 @@
     </header>
 
     <div class="container">
+        <div id="syncStatus" class="sync-status sync-success">
+            <i class="fas fa-sync-alt"></i> Sincronizado con App y CRM - Datos en tiempo real
+        </div>
+
         <div class="dashboard">
             <div class="stat-card">
-                <div class="stat-number" id="totalPayments">0</div>
+                <div class="stat-number" id="totalPayments">$0</div>
                 <div class="stat-label">Total por Cobrar</div>
             </div>
             <div class="stat-card pending">
@@ -478,14 +501,14 @@
                     <option value="3001+">Más de $3,000</option>
                 </select>
             </div>
-            <button class="action-btn btn-view" onclick="loadCollections()">
-                <i class="fas fa-sync-alt"></i> Actualizar
+            <button class="action-btn btn-view" onclick="syncWithCRM()">
+                <i class="fas fa-sync-alt"></i> Sincronizar
             </button>
         </div>
 
         <div class="collections-table">
             <div class="table-header">
-                <h2>Gestión de Cobranza</h2>
+                <h2>Gestión de Cobranza - Créditos Aprobados del CRM</h2>
             </div>
             <div class="table-container">
                 <table>
@@ -494,13 +517,18 @@
                             <th>Cliente</th>
                             <th>Crédito</th>
                             <th>Próximo Pago</th>
-                            <th>Monto</th>
+                            <th>Monto Pendiente</th>
                             <th>Días Atraso</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="collectionsTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem;">
+                                <i class="fas fa-sync fa-spin"></i> Sincronizando con CRM...
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -520,6 +548,7 @@
                     <p><strong>Teléfono:</strong> <span id="clientPhone"></span></p>
                     <p><strong>Crédito:</strong> $<span id="creditAmount"></span> - <span id="creditTerm"></span> meses</p>
                     <p><strong>Estado del Crédito:</strong> <span id="creditStatus"></span></p>
+                    <p><strong>Fecha de Aprobación:</strong> <span id="approvalDate"></span></p>
                 </div>
                 
                 <div class="payment-history" id="paymentHistory">
@@ -588,94 +617,137 @@
     </div>
 
     <script>
-        // Datos de ejemplo para el sistema de cobranza
+        // Sistema de cobranza conectado con App y CRM
         let collections = JSON.parse(localStorage.getItem('creditxpress_collections')) || [];
         let currentClientId = null;
-        
-        // Si no hay datos, inicializar con datos de ejemplo
-        if (collections.length === 0) {
-            initializeSampleData();
+
+        // Función principal para sincronizar con el CRM
+        function syncWithCRM() {
+            const syncStatus = document.getElementById('syncStatus');
+            
+            try {
+                // Obtener solicitudes aprobadas del CRM
+                const creditRequests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
+                const approvedRequests = creditRequests.filter(req => req.status === 'approved');
+                
+                syncStatus.innerHTML = `<i class="fas fa-sync-alt"></i> Sincronizando... ${approvedRequests.length} créditos aprobados encontrados`;
+                syncStatus.className = 'sync-status sync-warning';
+
+                if (approvedRequests.length === 0) {
+                    syncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> No hay créditos aprobados en el CRM';
+                    return;
+                }
+
+                // Para cada solicitud aprobada, verificar si ya existe en cobranza
+                approvedRequests.forEach(request => {
+                    const existingCollection = collections.find(c => c.creditId === request.id);
+                    
+                    if (!existingCollection) {
+                        // Calcular información del crédito
+                        const monthlyPayment = Math.round((request.amount + (request.amount * 0.1 * request.term)) / request.term);
+                        const nextPaymentDate = calculateNextPaymentDate(request.timestamp);
+                        
+                        // Crear nueva entrada en cobranza
+                        const newCollection = {
+                            id: Date.now(),
+                            clientId: request.clientId || Date.now(),
+                            clientName: request.clientName,
+                            clientEmail: request.clientEmail,
+                            clientPhone: request.clientPhone,
+                            creditId: request.id,
+                            creditAmount: request.amount,
+                            creditTerm: request.term,
+                            creditStatus: request.status,
+                            monthlyPayment: monthlyPayment,
+                            nextPaymentDate: nextPaymentDate,
+                            approvalDate: request.timestamp,
+                            payments: [],
+                            status: 'pending',
+                            overdueDays: 0
+                        };
+                        
+                        collections.push(newCollection);
+                        console.log(`✅ Nuevo crédito agregado a cobranza: ${request.clientName} - $${request.amount}`);
+                    } else {
+                        // Actualizar datos existentes si es necesario
+                        updateExistingCollection(existingCollection, request);
+                    }
+                });
+
+                // Actualizar estados de todos los créditos
+                collections.forEach((collection, index) => {
+                    updateCollectionStatus(index);
+                });
+
+                localStorage.setItem('creditxpress_collections', JSON.stringify(collections));
+                
+                syncStatus.innerHTML = `<i class="fas fa-check-circle"></i> Sincronizado - ${collections.length} créditos en cobranza`;
+                syncStatus.className = 'sync-status sync-success';
+                
+                loadStatistics();
+                loadCollections();
+                
+            } catch (error) {
+                console.error('Error en sincronización:', error);
+                syncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error en sincronización';
+                syncStatus.className = 'sync-status sync-warning';
+            }
         }
 
-        function initializeSampleData() {
-            const sampleCollections = [
-                {
-                    id: 1,
-                    clientId: 1001,
-                    clientName: "Juan Pérez García",
-                    clientEmail: "juan.perez@email.com",
-                    clientPhone: "55 1234 5678",
-                    creditId: 5001,
-                    creditAmount: 5000,
-                    creditTerm: 6,
-                    creditStatus: "approved",
-                    monthlyPayment: 1000,
-                    nextPaymentDate: "2023-11-15",
-                    payments: [
-                        { date: "2023-10-15", amount: 1000, method: "transfer", status: "paid" },
-                        { date: "2023-09-15", amount: 1000, method: "transfer", status: "paid" }
-                    ],
-                    status: "pending"
-                },
-                {
-                    id: 2,
-                    clientId: 1002,
-                    clientName: "María López Hernández",
-                    clientEmail: "maria.lopez@email.com",
-                    clientPhone: "55 2345 6789",
-                    creditId: 5002,
-                    creditAmount: 3000,
-                    creditTerm: 6,
-                    creditStatus: "approved",
-                    monthlyPayment: 600,
-                    nextPaymentDate: "2023-10-10",
-                    payments: [
-                        { date: "2023-09-10", amount: 600, method: "cash", status: "paid" },
-                        { date: "2023-08-10", amount: 600, method: "cash", status: "paid" },
-                        { date: "2023-07-10", amount: 600, method: "cash", status: "paid" }
-                    ],
-                    status: "overdue",
-                    overdueDays: 15
-                },
-                {
-                    id: 3,
-                    clientId: 1003,
-                    clientName: "Carlos Rodríguez Martínez",
-                    clientEmail: "carlos.rodriguez@email.com",
-                    clientPhone: "55 3456 7890",
-                    creditId: 5003,
-                    creditAmount: 4000,
-                    creditTerm: 4,
-                    creditStatus: "approved",
-                    monthlyPayment: 1200,
-                    nextPaymentDate: "2023-11-05",
-                    payments: [
-                        { date: "2023-10-05", amount: 1200, method: "card", status: "paid" }
-                    ],
-                    status: "pending"
-                },
-                {
-                    id: 4,
-                    clientId: 1004,
-                    clientName: "Ana García Sánchez",
-                    clientEmail: "ana.garcia@email.com",
-                    clientPhone: "55 4567 8901",
-                    creditId: 5004,
-                    creditAmount: 2000,
-                    creditTerm: 3,
-                    creditStatus: "approved",
-                    monthlyPayment: 800,
-                    nextPaymentDate: "2023-09-25",
-                    payments: [
-                        { date: "2023-08-25", amount: 800, method: "transfer", status: "paid" }
-                    ],
-                    status: "overdue",
-                    overdueDays: 35
-                }
-            ];
+        // Calcular fecha del próximo pago
+        function calculateNextPaymentDate(approvalDate) {
+            const approval = new Date(approvalDate);
+            const today = new Date();
             
-            collections = sampleCollections;
-            localStorage.setItem('creditxpress_collections', JSON.stringify(collections));
+            // Si la aprobación fue hace menos de 30 días, primer pago en 30 días
+            if ((today - approval) / (1000 * 60 * 60 * 24) < 30) {
+                const firstPayment = new Date(approval);
+                firstPayment.setDate(firstPayment.getDate() + 30);
+                return firstPayment.toISOString().split('T')[0];
+            }
+            
+            // Calcular próximo pago basado en pagos existentes
+            return today.toISOString().split('T')[0];
+        }
+
+        // Actualizar colección existente
+        function updateExistingCollection(collection, request) {
+            // Aquí puedes actualizar datos si cambian en el CRM
+            collection.clientName = request.clientName;
+            collection.clientEmail = request.clientEmail;
+            collection.clientPhone = request.clientPhone;
+        }
+
+        // Actualizar estado de la colección
+        function updateCollectionStatus(collectionIndex) {
+            const collection = collections[collectionIndex];
+            
+            // Calcular el monto pagado
+            const paidAmount = collection.payments.filter(p => p.status === 'paid')
+                .reduce((sum, payment) => sum + payment.amount, 0);
+            
+            // Verificar si el crédito está completamente pagado
+            if (paidAmount >= collection.creditAmount) {
+                collection.status = 'paid';
+                collection.overdueDays = 0;
+                return;
+            }
+            
+            // Calcular días de atraso
+            const today = new Date();
+            const nextPaymentDate = new Date(collection.nextPaymentDate);
+            const daysOverdue = Math.floor((today - nextPaymentDate) / (1000 * 60 * 60 * 24));
+            
+            if (daysOverdue > 0) {
+                collection.status = 'overdue';
+                collection.overdueDays = daysOverdue;
+                
+                // Actualizar notificaciones para la app
+                updateAppNotifications();
+            } else {
+                collection.status = 'pending';
+                collection.overdueDays = 0;
+            }
         }
 
         function loadStatistics() {
@@ -683,7 +755,7 @@
                 const paidAmount = collection.payments.filter(p => p.status === 'paid')
                     .reduce((paidSum, payment) => paidSum + payment.amount, 0);
                 const remaining = collection.creditAmount - paidAmount;
-                return sum + remaining;
+                return sum + Math.max(0, remaining);
             }, 0);
             
             const pending = collections.filter(c => c.status === 'pending').length;
@@ -710,7 +782,7 @@
 
             if (daysFilter !== 'all') {
                 filteredCollections = filteredCollections.filter(c => {
-                    if (!c.overdueDays) return false;
+                    if (!c.overdueDays) return paymentFilter === 'pending';
                     
                     switch (daysFilter) {
                         case '1-7':
@@ -750,6 +822,17 @@
 
             tbody.innerHTML = '';
 
+            if (filteredCollections.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-info-circle"></i> No hay créditos que coincidan con los filtros
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
             filteredCollections.forEach(collection => {
                 const paidAmount = collection.payments.filter(p => p.status === 'paid')
                     .reduce((sum, payment) => sum + payment.amount, 0);
@@ -760,7 +843,7 @@
                 
                 // Determinar el indicador de atraso
                 let overdueIndicator = '';
-                if (collection.overdueDays) {
+                if (collection.overdueDays && collection.overdueDays > 0) {
                     let indicatorClass = 'overdue-1';
                     if (collection.overdueDays > 7 && collection.overdueDays <= 15) {
                         indicatorClass = 'overdue-2';
@@ -775,11 +858,12 @@
                 row.innerHTML = `
                     <td>
                         <strong>${collection.clientName}</strong><br>
-                        <small>${collection.clientEmail}</small>
+                        <small>${collection.clientEmail}</small><br>
+                        <small style="color: var(--gray);">${collection.clientPhone}</small>
                     </td>
                     <td>
                         $${collection.creditAmount.toLocaleString()}<br>
-                        <small>${collection.creditTerm} meses</small>
+                        <small>${collection.creditTerm} meses - #${collection.creditId}</small>
                     </td>
                     <td>
                         ${collection.nextPaymentDate}<br>
@@ -825,6 +909,7 @@
             document.getElementById('creditAmount').textContent = collection.creditAmount.toLocaleString();
             document.getElementById('creditTerm').textContent = collection.creditTerm;
             document.getElementById('creditStatus').textContent = getStatusText(collection.creditStatus);
+            document.getElementById('approvalDate').textContent = new Date(collection.approvalDate).toLocaleDateString();
             
             // Cargar historial de pagos
             const paymentsList = document.getElementById('paymentsList');
@@ -835,7 +920,7 @@
                     const paymentItem = document.createElement('div');
                     paymentItem.className = 'payment-item';
                     paymentItem.innerHTML = `
-                        <div class="payment-date">${payment.date}</div>
+                        <div class="payment-date">${new Date(payment.date).toLocaleDateString()}</div>
                         <div class="payment-amount">$${payment.amount.toLocaleString()}</div>
                         <div class="payment-status status-badge status-${payment.status}">
                             ${getStatusText(payment.status)}
@@ -844,7 +929,7 @@
                     paymentsList.appendChild(paymentItem);
                 });
             } else {
-                paymentsList.innerHTML = '<p>No hay pagos registrados</p>';
+                paymentsList.innerHTML = '<p style="text-align: center; color: var(--gray);">No hay pagos registrados</p>';
             }
             
             document.getElementById('collectionModal').style.display = 'flex';
@@ -940,45 +1025,6 @@
             loadCollections();
         }
 
-        function updateCollectionStatus(collectionIndex) {
-            const collection = collections[collectionIndex];
-            
-            // Calcular el monto pagado
-            const paidAmount = collection.payments.filter(p => p.status === 'paid')
-                .reduce((sum, payment) => sum + payment.amount, 0);
-            
-            // Verificar si el crédito está completamente pagado
-            if (paidAmount >= collection.creditAmount) {
-                collection.status = 'paid';
-                collection.overdueDays = 0;
-                return;
-            }
-            
-            // Calcular días de atraso
-            const today = new Date();
-            const nextPaymentDate = new Date(collection.nextPaymentDate);
-            const daysOverdue = Math.floor((today - nextPaymentDate) / (1000 * 60 * 60 * 24));
-            
-            if (daysOverdue > 0) {
-                collection.status = 'overdue';
-                collection.overdueDays = daysOverdue;
-            } else {
-                collection.status = 'pending';
-                collection.overdueDays = 0;
-            }
-            
-            // Actualizar la fecha del próximo pago si es necesario
-            if (paidAmount > 0) {
-                const lastPaymentDate = new Date(collection.payments
-                    .filter(p => p.status === 'paid')
-                    .sort((a, b) => new Date(b.date) - new Date(a.date))[0].date);
-                
-                const nextPayment = new Date(lastPaymentDate);
-                nextPayment.setMonth(nextPayment.getMonth() + 1);
-                collection.nextPaymentDate = nextPayment.toISOString().split('T')[0];
-            }
-        }
-
         function closeModal() {
             document.getElementById('collectionModal').style.display = 'none';
             currentClientId = null;
@@ -995,64 +1041,33 @@
             return statusMap[status] || status;
         }
 
-        // Función para sincronizar con el CRM y la app
-        function syncWithCRM() {
-            // Obtener solicitudes aprobadas del CRM
-            const creditRequests = JSON.parse(localStorage.getItem('creditxpress_requests')) || [];
-            const approvedRequests = creditRequests.filter(req => req.status === 'approved');
-            
-            // Para cada solicitud aprobada, verificar si ya existe en cobranza
-            approvedRequests.forEach(request => {
-                const existingCollection = collections.find(c => c.creditId === request.id);
-                
-                if (!existingCollection) {
-                    // Crear nueva entrada en cobranza
-                    const newCollection = {
-                        id: Date.now(),
-                        clientId: request.clientId || Date.now(),
-                        clientName: request.clientName,
-                        clientEmail: request.clientEmail,
-                        clientPhone: request.clientPhone,
-                        creditId: request.id,
-                        creditAmount: request.amount,
-                        creditTerm: request.term,
-                        creditStatus: request.status,
-                        monthlyPayment: Math.round((request.amount + (request.amount * 0.1 * request.term)) / request.term),
-                        nextPaymentDate: new Date().toISOString().split('T')[0],
-                        payments: [],
-                        status: 'pending'
-                    };
-                    
-                    collections.push(newCollection);
-                }
-            });
-            
-            localStorage.setItem('creditxpress_collections', JSON.stringify(collections));
-            loadStatistics();
-            loadCollections();
-            
-            console.log('✅ Datos sincronizados con CRM');
-        }
-
         // Función para notificar a la app sobre atrasos
         function updateAppNotifications() {
             const overdueCollections = collections.filter(c => c.status === 'overdue');
             
-            // Aquí podrías enviar notificaciones a la app
-            // Por ahora, solo actualizamos el localStorage que la app puede leer
+            // Guardar notificaciones para que la app las lea
             localStorage.setItem('creditxpress_overdue_notifications', JSON.stringify(overdueCollections));
             
             console.log(`📢 ${overdueCollections.length} notificaciones de atraso actualizadas`);
         }
 
+        // Escuchar cambios en el localStorage (para sincronización en tiempo real)
+        function setupRealtimeSync() {
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'creditxpress_requests') {
+                    // El CRM actualizó las solicitudes, sincronizar
+                    syncWithCRM();
+                }
+            });
+        }
+
+        // Inicializar cuando cargue la página
         window.addEventListener('load', () => {
-            syncWithCRM();
-            loadStatistics();
-            loadCollections();
+            setupRealtimeSync();
+            syncWithCRM(); // Sincronizar automáticamente al cargar
             
             // Sincronizar cada 30 segundos
             setInterval(syncWithCRM, 30000);
-            setInterval(updateAppNotifications, 60000);
         });
 
         window.addEventListener('click', (e) => {
